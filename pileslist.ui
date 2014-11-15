@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PilesList</class>
+ <widget class="QDialog" name="PilesList">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>430</width>
+    <height>324</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Piles</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="appres.qrc">
+    <normaloff>:/icons/resources/icons/package.png</normaloff>:/icons/resources/icons/package.png</iconset>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QTreeWidget" name="treeWidget">
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string notr="true">Name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Status</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+  <action name="actionAdd_source_text">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/text.png</normaloff>:/icons/resources/icons/text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Text File</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds piles as listed in a text file (one per line)</string>
+   </property>
+  </action>
+  <action name="actionAdd_source_directory">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/folder.png</normaloff>:/icons/resources/icons/folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Directory</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds all sub-directories as piles</string>
+   </property>
+  </action>
+  <action name="actionAdd_source_XML_File">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/xml_imports.png</normaloff>:/icons/resources/icons/xml_imports.png</iconset>
+   </property>
+   <property name="text">
+    <string>XML File</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds piles as listed in an XML file</string>
+   </property>
+  </action>
+  <action name="actionAdd_source_URL">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/link.png</normaloff>:/icons/resources/icons/link.png</iconset>
+   </property>
+   <property name="text">
+    <string>URL</string>
+   </property>
+   <property name="toolTip">
+    <string>Adds piles as listed in a remote text or XML file</string>
+   </property>
+  </action>
+  <action name="actionAdd_user_pile">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/user_red.png</normaloff>:/icons/resources/icons/user_red.png</iconset>
+   </property>
+   <property name="text">
+    <string>User Pile</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a single pile</string>
+   </property>
+  </action>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/cross.png</normaloff>:/icons/resources/icons/cross.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove a single pile or source</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="appres.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>PilesList</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>PilesList</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
