@@ -1,9 +1,10 @@
+#include "../config.h"
+#include "../pilesgui.h"
+#include "../setting_names.h"
+
 #include "gitwrapper.h"
-#include "config.h"
 #include "programrunner.h"
-#include "pilesgui.h"
-#include "setting_names.h"
-#include "support/waiter.h"
+#include "waiter.h"
 
 #include <QSettings>
 #include <QDebug>
