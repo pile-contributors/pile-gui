@@ -45,7 +45,10 @@ SOURCES += main.cpp\
     custcmddlg.cpp \
     copyreplacedlg.cpp \
     support/programrunner.cpp \
-    support/waiter.cpp
+    support/waiter.cpp \
+    snippetsdlg.cpp \
+    snippets/snipmodel.cpp \
+    snippets/snipitem.cpp
 
 HEADERS  += mainwindow.h \
     setting_names.h \
@@ -64,14 +67,18 @@ HEADERS  += mainwindow.h \
     custcmddlg.h \
     copyreplacedlg.h \
     support/programrunner.h \
-    support/waiter.h
+    support/waiter.h \
+    snippetsdlg.h \
+    snippets/snipmodel.h \
+    snippets/snipitem.h
 
 FORMS    += mainwindow.ui \
     pileslist.ui \
     settingsdlg.ui \
     newpiledlg.ui \
     custcmddlg.ui \
-    copyreplacedlg.ui
+    copyreplacedlg.ui \
+    snippetsdlg.ui
 
 RESOURCES += \
     appres.qrc

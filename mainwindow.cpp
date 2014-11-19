@@ -5,6 +5,7 @@
 #include "pileslist.h"
 #include "settingsdlg.h"
 #include "newpiledlg.h"
+#include "snippetsdlg.h"
 #include "custcmddlg.h"
 #include "copyreplacedlg.h"
 #include "config.h"
@@ -707,4 +708,10 @@ void MainWindow::on_actionCopy_and_replace_triggered()
         if (dlg.perform ()) break;
     }
 
+}
+
+void MainWindow::on_actionSnippets_triggered()
+{
+    SnippetsDlg dlg;
+    dlg.exec ();
 }

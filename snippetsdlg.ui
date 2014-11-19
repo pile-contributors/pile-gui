@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SnippetsDlg</class>
+ <widget class="QDialog" name="SnippetsDlg">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>777</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Snippets</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Snippets database:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="database_path"/>
+     </item>
+     <item>
+      <widget class="QToolButton" name="database_browse">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QTreeView" name="tv_content">
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" rowspan="2">
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="database_path_2"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Icon</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QComboBox" name="comboBox">
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="database_browse_2">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Content</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QTextEdit" name="textEdit">
+       <property name="placeholderText">
+        <string>Fill in the content of your snippet here</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+  <action name="actionAdd_new_group">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/folder.png</normaloff>:/icons/resources/icons/folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add new group</string>
+   </property>
+  </action>
+  <action name="actionAdd_new_snipped">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/star.png</normaloff>:/icons/resources/icons/star.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add new snipped</string>
+   </property>
+  </action>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/cross.png</normaloff>:/icons/resources/icons/cross.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+  </action>
+  <action name="actionSave_database">
+   <property name="text">
+    <string>Save database</string>
+   </property>
+  </action>
+  <action name="actionReload_database">
+   <property name="text">
+    <string>Reload database</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="appres.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -188,6 +188,7 @@ alternate-background-color: rgb(246, 255, 249);</string>
    <addaction name="actionPaste"/>
    <addaction name="actionCopy_and_replace"/>
    <addaction name="separator"/>
+   <addaction name="actionSnippets"/>
   </widget>
   <action name="actionSet_root_here">
    <property name="icon">
@@ -343,6 +344,18 @@ alternate-background-color: rgb(246, 255, 249);</string>
    </property>
    <property name="toolTip">
     <string>Copy the files and replace the content</string>
+   </property>
+  </action>
+  <action name="actionSnippets">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/external.png</normaloff>:/icons/resources/icons/external.png</iconset>
+   </property>
+   <property name="text">
+    <string>Snippets</string>
+   </property>
+   <property name="toolTip">
+    <string>View some snippets</string>
    </property>
   </action>
  </widget>

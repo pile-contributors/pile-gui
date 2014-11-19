@@ -83,6 +83,8 @@ private slots:
 
     void on_actionCopy_and_replace_triggered();
 
+    void on_actionSnippets_triggered();
+
 private:
     Ui::MainWindow *ui;
     QFileSystemModel *model;

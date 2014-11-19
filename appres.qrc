@@ -25,5 +25,6 @@
         <file>resources/icons/page_paste.png</file>
         <file>resources/icons/add.png</file>
         <file>resources/icons/calendar_copy.png</file>
+        <file>resources/icons/external.png</file>
     </qresource>
 </RCC>
