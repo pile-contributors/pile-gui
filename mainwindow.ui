@@ -188,6 +188,7 @@ alternate-background-color: rgb(246, 255, 249);</string>
    <addaction name="actionPaste"/>
    <addaction name="actionCopy_and_replace"/>
    <addaction name="separator"/>
+   <addaction name="actionEnvironment_Variables"/>
    <addaction name="actionSnippets"/>
   </widget>
   <action name="actionSet_root_here">
@@ -356,6 +357,18 @@ alternate-background-color: rgb(246, 255, 249);</string>
    </property>
    <property name="toolTip">
     <string>View some snippets</string>
+   </property>
+  </action>
+  <action name="actionEnvironment_Variables">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/application_xp_terminal.png</normaloff>:/icons/resources/icons/application_xp_terminal.png</iconset>
+   </property>
+   <property name="text">
+    <string>Environment Variables</string>
+   </property>
+   <property name="toolTip">
+    <string>Show and edit environment variables</string>
    </property>
   </action>
  </widget>

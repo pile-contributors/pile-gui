@@ -85,6 +85,8 @@ private slots:
 
     void on_actionSnippets_triggered();
 
+    void on_actionEnvironment_Variables_triggered();
+
 private:
     Ui::MainWindow *ui;
     QFileSystemModel *model;

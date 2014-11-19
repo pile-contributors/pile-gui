@@ -7,8 +7,7 @@
 
 SnipItem::SnipItem() : QTreeWidgetItem()
 {
-    setFlags (Qt::ItemIsUserCheckable |
-              Qt::ItemIsSelectable |
+    setFlags (Qt::ItemIsSelectable |
               Qt::ItemIsEnabled);
     //setDefaultIcon ();
 }

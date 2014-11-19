@@ -145,6 +145,9 @@ bool SnippetsDlg::saveXMLFile (const QString & s_file)
             break;
         }
 
+        QTreeWidgetItem * tvi = ui->tv_content->currentItem ();
+        on_tv_content_currentItemChanged (tvi, tvi);
+
         // open the file
         QFile file (s_file);
         if (!file.open(QIODevice::WriteOnly)) {

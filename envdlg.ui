@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Environment Variables</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
@@ -38,7 +38,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QTreeWidget" name="treeWidget">
+      <widget class="QTreeWidget" name="tv_content">
        <property name="contextMenuPolicy">
         <enum>Qt::CustomContextMenu</enum>
        </property>
@@ -55,7 +55,21 @@
       </widget>
      </item>
      <item>
-      <widget class="QTextEdit" name="textEdit">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="variable_name"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QTextEdit" name="te_value">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -86,8 +100,41 @@
     </widget>
    </item>
   </layout>
+  <action name="actionSave_database">
+   <property name="text">
+    <string>Save database</string>
+   </property>
+  </action>
+  <action name="actionReload_database">
+   <property name="text">
+    <string>Reload database</string>
+   </property>
+  </action>
+  <action name="actionCreate_new_variable">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/add.png</normaloff>:/icons/resources/icons/add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create new variable</string>
+   </property>
+   <property name="toolTip">
+    <string>Creates a variable with no initial value</string>
+   </property>
+  </action>
+  <action name="actionRemove_variable">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/cross.png</normaloff>:/icons/resources/icons/cross.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove variable</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="appres.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

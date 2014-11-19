@@ -1,3 +1,4 @@
+#include "config.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "setting_names.h"
@@ -8,7 +9,7 @@
 #include "snippetsdlg.h"
 #include "custcmddlg.h"
 #include "copyreplacedlg.h"
-#include "config.h"
+#include "envdlg.h"
 
 #include <QSettings>
 #include <QDesktopServices>
@@ -713,5 +714,11 @@ void MainWindow::on_actionCopy_and_replace_triggered()
 void MainWindow::on_actionSnippets_triggered()
 {
     SnippetsDlg dlg;
+    dlg.exec ();
+}
+
+void MainWindow::on_actionEnvironment_Variables_triggered()
+{
+    EnvDlg dlg;
     dlg.exec ();
 }

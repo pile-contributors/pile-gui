@@ -30,5 +30,7 @@
 
 
 #define STG_SNIPP_DB        "SNIPPETS/DATABASE"
+#define STG_ENVAR_DB        "ENV_VAR/DATABASE"
+
 
 #endif // SETTING_NAMES_H
