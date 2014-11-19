@@ -1,33 +1,82 @@
 #ifndef SNIPITEM_H
 #define SNIPITEM_H
 
-#include <QDomNode>
-#include <QDomElement>
-#include <QHash>
+#include <QTreeWidgetItem>
 
-class SnipItem
+class SnipGroup;
+
+class SnipItem : public QTreeWidgetItem
 {
 public:
-    SnipItem(QDomElement &node, int row, SnipItem *parent = 0);
-    ~SnipItem();
-    SnipItem *child(int i);
-    SnipItem *parent();
-    QDomElement node() const;
-    int row();
+    SnipItem();
+    virtual ~SnipItem();
 
+    virtual bool
+    isGrup() = 0;
 
-    void SetNodeName(QString name);
-    void SetNodeCost(QString cost);
-    QString NodeName();
-    QString NodeCost();
-    void RemoveChildren(SnipItem *node);
+    void
+    setName (
+            const QString & s_value) {
+        setText (0, s_value);
+    }
 
+    void
+    setIcon (
+            const QString & s_value);
 
+    const QString &
+    iconString () {
+        return s_icon_;
+    }
 
-private:
-    QDomElement domNode;
-    QHash<int,SnipItem*> childItems;
-    SnipItem *parentItem;
-    int rowNumber;
+    QString
+    name () {
+        return text (0);
+    }
+
+    QIcon
+    icon () {
+        return QTreeWidgetItem::icon (0);
+    }
+
+    void
+    setDefaultIcon();
+
+    SnipGroup *parentSnip();
+    QString s_icon_;
 };
+
+class SnipGroup : public SnipItem
+{
+public:
+    SnipGroup() {}
+    virtual ~SnipGroup() {}
+
+    virtual bool
+    isGrup() {return true; }
+};
+
+class SnipSnip : public SnipItem
+{
+public:
+    SnipSnip() {}
+    virtual ~SnipSnip() {}
+
+    void
+    setContent(
+            const QString &s_value) {
+        setText (1, s_value);
+    }
+
+    QString
+    content() const {
+        return text (1);
+    }
+
+    virtual bool
+    isGrup() {return false; }
+
+};
+
+
 #endif // SNIPITEM_H

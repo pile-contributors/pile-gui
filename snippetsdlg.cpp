@@ -14,6 +14,8 @@
 #include <QDomDocument>
 #include <QTextStream>
 #include <QMenu>
+#include <QMessageBox>
+
 
 QDomDocument createNewXml()
 {
@@ -22,20 +24,22 @@ QDomDocument createNewXml()
                 "xml", "version=\"1.0\" encoding=\"UTF-8\"");
     document.appendChild (header);
 
-    QDomElement root = document.createElement("snippets");
+    QDomElement root = document.createElement ("snippets");
     document.appendChild(root);
 
     return document;
 }
-
 
 SnippetsDlg::SnippetsDlg(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SnippetsDlg),
     model_(NULL)
 {
-    QSettings stg;
+
     ui->setupUi(this);
+    model_ = new SnipModel (ui->tv_content);
+
+    QSettings stg;
 
     QString s_path = stg.value (STG_SNIPP_DB).toString ();
     if (s_path.isEmpty ()) {
@@ -57,6 +61,8 @@ SnippetsDlg::SnippetsDlg(QWidget *parent) :
         }
     }
     ui->database_path->setText (s_path);
+
+    on_tv_content_currentItemChanged (NULL, NULL);
 
     loadXMLFile (s_path);
 }
@@ -88,8 +94,6 @@ bool SnippetsDlg::loadXMLFile(const QString & s_file)
 
     for (;;) {
 
-        QSettings stg;
-        stg.setValue (STG_SNIPP_DB, s_file);
 
         // open the file
         QFile file (s_file);
@@ -101,19 +105,22 @@ bool SnippetsDlg::loadXMLFile(const QString & s_file)
             break;
         }
 
+        QSettings stg;
+        stg.setValue (STG_SNIPP_DB, s_file);
+
         // get the tree parsed
         QDomDocument document;
         if (!document.setContent (&file)) {
             PilesGui::showError (
-                        tr("The document %1 is not a valid XML file")
+                        tr ("The document %1 is not a valid XML file")
                         .arg(s_file));
             break;
         }
 
         // build the model
-        SnipModel *newModel = new SnipModel (document, this);
-        ui->tv_content->setModel (newModel);
         if (model_ != NULL) delete model_;
+        model_ = NULL;
+        SnipModel *newModel = new SnipModel (ui->tv_content, document);
         model_ = newModel;
 
         // close the source file
@@ -149,7 +156,9 @@ bool SnippetsDlg::saveXMLFile (const QString & s_file)
         }
 
         QTextStream txs (&file);
-        model_->domDocument().save (txs, 2);
+        QDomDocument doc ("snippets");
+        model_->saveXML (doc);
+        doc.save (txs, 2);
 
         // close the source file
         file.close();
@@ -189,14 +198,13 @@ void SnippetsDlg::on_actionAdd_new_group_triggered()
             break;
         }
 
-        QModelIndex msel = ui->tv_content->currentIndex ();
-
-        if (msel.isValid ()) {
-            model_->AddGroup (msel, tr("New group"));
+        SnipGroup * msel = model_->currentGroup();
+        if (msel != NULL) {
+            model_->addGroup (tr("New group"), msel);
             break;
         }
 
-        model_->AddRootGroup (tr("New group"));
+        model_->addRootGroup (tr("New group"));
         break;
     }
 
@@ -210,9 +218,9 @@ void SnippetsDlg::on_actionAdd_new_snipped_triggered()
             break;
         }
 
-        QModelIndex msel = ui->tv_content->currentIndex ();
-        if (msel.isValid ()) {
-            model_->AddItm (msel, tr("New snippet"));
+        SnipGroup * msel = model_->currentGroup();
+        if (msel != NULL) {
+            model_->addSnip (tr("New snippet"), msel);
         } else {
             PilesGui::showError (tr ("Please select the location, first"));
         }
@@ -223,12 +231,8 @@ void SnippetsDlg::on_actionAdd_new_snipped_triggered()
 
 void SnippetsDlg::on_actionRemove_triggered()
 {
-    QModelIndex msel = ui->tv_content->currentIndex ();
-    if (msel.isValid ()) {
-
-    } else {
-        PilesGui::showError (tr ("Nothing selected"));
-    }
+    SnipItem * msel = model_->currentItem ();
+    model_->removeItem (msel);
 }
 
 void SnippetsDlg::on_actionSave_database_triggered()
@@ -238,5 +242,80 @@ void SnippetsDlg::on_actionSave_database_triggered()
 
 void SnippetsDlg::on_actionReload_database_triggered()
 {
+    int res = QMessageBox::question (
+                this, tr("Reload content"),
+                tr("You are about to reload the content "
+                   "and discard all changes made to this file\n\n"
+                   "Are you sure?"),
+                QMessageBox::Yes, QMessageBox::No);
+    if (res == QMessageBox::No) return;
     loadXMLFile (ui->database_path->text());
+}
+
+void SnippetsDlg::on_tv_content_currentItemChanged(
+        QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+    model_->saveToItem(
+                static_cast<SnipItem*>(previous),
+                ui->le_name->text (),
+                ui->le_icon->currentText (),
+                ui->tx_content->toPlainText ());
+
+    QString s_name;
+    QString s_icon;
+    QString s_content;
+
+    model_->getFromItem(
+                static_cast<SnipItem*>(current),
+                s_name,
+                s_icon,
+                s_content);
+    ui->le_name->setText (s_name),
+    ui->le_icon->setCurrentText (s_icon),
+    ui->tx_content->setPlainText (s_content);
+
+    if (current == NULL) {
+        ui->le_name->setEnabled (false);
+        ui->le_icon->setEnabled (false);
+        ui->tx_content->setEnabled (false);
+        ui->icon_sample->setPixmap (QPixmap());
+    } else {
+        SnipItem * sp = static_cast<SnipItem*>(current);
+        QIcon ic = sp->icon();
+        ui->icon_sample->setPixmap (ic.pixmap (16, 16));
+        if (sp->isGrup () || (sp->parent() == NULL)) {
+            ui->le_name->setEnabled (true);
+            ui->le_icon->setEnabled (true);
+            ui->tx_content->setEnabled (false);
+        } else {
+            ui->le_name->setEnabled (true);
+            ui->le_icon->setEnabled (true);
+            ui->tx_content->setEnabled (true);
+        }
+    }
+}
+
+void SnippetsDlg::closeEvent(QCloseEvent *)
+{
+    QTreeWidgetItem * tvi = ui->tv_content->currentItem ();
+    if (tvi != NULL)
+        on_tv_content_currentItemChanged (NULL, tvi);
+    saveXMLFile (ui->database_path->text ());
+}
+
+void SnippetsDlg::on_b_icon_clicked()
+{
+    QString filePath = QFileDialog::getOpenFileName(
+                this, tr("Open Icon"),
+                ui->le_icon->currentText (), tr("Image files (*.png)"));
+
+    if (!filePath.isEmpty()) {
+        ui->le_icon->setCurrentText (filePath);
+        QIcon ic (filePath);
+        if (ic.isNull ()) {
+            ui->icon_sample->setPixmap (QPixmap());
+        } else {
+            ui->icon_sample->setPixmap (ic.pixmap (16, 16));
+        }
+    }
 }

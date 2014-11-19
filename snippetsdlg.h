@@ -8,6 +8,7 @@ class SnippetsDlg;
 }
 
 class SnipModel;
+class QTreeWidgetItem;
 
 class SnippetsDlg : public QDialog
 {
@@ -38,6 +39,16 @@ private slots:
     void on_actionSave_database_triggered();
 
     void on_actionReload_database_triggered();
+
+    void on_tv_content_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+
+    void on_b_icon_clicked();
+
+protected:
+
+    void
+    closeEvent (
+            QCloseEvent *);
 
 private:
     Ui::SnippetsDlg *ui;

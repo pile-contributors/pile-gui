@@ -1,216 +1,380 @@
 #include "snipmodel.h"
 #include "snipitem.h"
 
-
-#include <QtXml>
-#include <QDomNode>
-#include <QDomElement>
+#include "../pilesgui.h"
 #include <QDomDocument>
 
-
-SnipModel::SnipModel(QDomDocument document, QObject *parent)
-    : QAbstractItemModel(parent), dom_document_(document)
+SnipModel::SnipModel (QTreeWidget * tv) :
+    tv_(tv)
 {
-    QDomElement del = dom_document_.documentElement ();
-    rootItem = new SnipItem (del, 0);
+    root_ = new SnipGroup ();
+    root_->setText (0, QObject::tr ("(no database)"));
+    tv->addTopLevelItem (root_);
+    root_->setDefaultIcon ();
+}
+
+SnipModel::SnipModel (QTreeWidget * tv, QDomDocument & document) :
+    tv_(tv)
+{
+    root_ = new SnipGroup ();
+    root_->setText (0, QObject::tr ("(no database)"));
+    tv->addTopLevelItem (root_);
+    root_->setDefaultIcon ();
+
+    loadXML (document);
+}
+
+SnipModel::~SnipModel ()
+{
+    QTreeWidgetItem * tvi;
+    int i_max = tv_->topLevelItemCount ();
+    for (int i = 0; i < i_max; ++i) {
+        tvi = tv_->takeTopLevelItem (0);
+        delete tvi;
+    }
 }
 
 
-
-SnipModel::~SnipModel()
+QDomElement SnipModel::saveXMLItem (
+        QDomElement & el_parent, SnipItem * item)
 {
-    delete rootItem;
+    QDomElement el_ret;
+    for (;;) {
+
+        el_ret = el_parent.ownerDocument ().createElement ("entry");
+        el_ret.setAttribute ("name", item->name ());
+        el_ret.setAttribute ("icon", item->iconString ());
+
+        el_parent.appendChild (el_ret);
+        break;
+    }
+
+    return el_ret;
 }
 
-
-
-int SnipModel::columnCount(const QModelIndex &/*parent*/) const
+bool SnipModel::loadXMLitem (const QDomElement & el, SnipItem * it)
 {
-    return 3;
+    bool b_ret = false;
+    for (;;) {
+
+        it->setName (el.attribute ("name"));
+        it->setIcon (el.attribute ("icon"));
+
+        b_ret = true;
+        break;
+    }
+
+    return b_ret;
 }
 
-
-
-QVariant SnipModel::data(const QModelIndex &index, int role) const
+bool SnipModel::saveXMLSnip (QDomElement & el_parent, SnipSnip * snip)
 {
-    if (!index.isValid())
-        return QVariant();
+    bool b_ret = false;
+    for (;;) {
 
-    if ((role != Qt::DisplayRole) && (role !=Qt::EditRole))
-        return QVariant();
+        QDomElement el = saveXMLItem (el_parent, snip);
+        el.setAttribute ("type", "snippet");
+        el.setAttribute ("content", snip->content ());
 
-    SnipItem *item = static_cast<SnipItem*>(index.internalPointer());
+        b_ret = true;
+        break;
+    }
 
-    QDomNode node = item->node();
+    return b_ret;
+}
 
-    QStringList attributes;
-    QDomNamedNodeMap attributeMap = node.attributes();
+bool SnipModel::loadXMLSnip (const QDomElement & el, SnipGroup * parent)
+{
+    bool b_ret = false;
+    for (;;) {
+        SnipSnip * snp = new SnipSnip();
+        parent->addChild (snp);
 
-    switch (index.column()) {
-        case 0:
-            return node.nodeName();
-        case 1:
-            for (int i = 0; i < attributeMap.count(); ++i) {
-                QDomNode attribute = attributeMap.item(i);
-                attributes << attribute.nodeName() + "=\""
-                              +attribute.nodeValue() + "\"";
+        if (!loadXMLitem (el, snp)) {
+            PilesGui::showError (
+                        QObject::tr (
+                            "The xml document failed to load due to %1")
+                        .arg (el.text ()));
+            break;
+        }
+
+        snp->setContent  (el.attribute ("content"));
+
+        b_ret = true;
+        break;
+    }
+
+    return b_ret;
+}
+
+bool SnipModel::saveXMLGroup (QDomElement & el_parent, SnipGroup * grp)
+{
+    bool b_ret = false;
+    for (;;) {
+
+        QDomElement el = saveXMLItem (el_parent, grp);
+        el.setAttribute ("type", "group");
+        el.setAttribute ("expanded", grp->isExpanded () ? "true" : "false");
+
+        QTreeWidgetItem * tvi;
+        int i_max = grp->childCount ();
+        bool b_intermed = true;
+        for (int i = 0; i < i_max; ++i) {
+            tvi = grp->child (i);
+            SnipItem * item = static_cast<SnipItem *>(tvi);
+            if (item->isGrup ()) {
+                SnipGroup * grp = static_cast<SnipGroup *>(item);
+                b_intermed = saveXMLGroup (el, grp);
+            } else {
+                SnipSnip * snip = static_cast<SnipSnip *>(item);
+                b_intermed = saveXMLSnip (el, snip);
             }
-            return attributes.join(' ');
-        case 2:
-            return node.nodeValue().split("\n").join(' ');
-        default:
-            return QVariant();
+            if (!b_intermed) break;
+        }
+        if (!b_intermed) break;
+
+        b_ret = true;
+        break;
+    }
+
+    return b_ret;
+}
+
+bool SnipModel::loadXMLGroup (const QDomElement & el_grp, SnipGroup * parent)
+{
+    bool b_ret = false;
+    for (;;) {
+
+        SnipGroup * grp = new SnipGroup();
+        parent->addChild (grp);
+
+        if (!loadXMLitem (el_grp, grp)) {
+            PilesGui::showError (
+                        QObject::tr (
+                            "The xml document failed to load due to %1")
+                        .arg (el_grp.text ()));
+            break;
+        }
+
+        bool b_subitems = true;
+        QDomNodeList nl = el_grp.childNodes ();
+        int i_max = nl.count ();
+        for (int i = 0; i < i_max; ++i) {
+
+            const QDomNode & e (nl.at (i));
+            if (e.isElement ()) {
+
+                const QDomElement el = e.toElement ();
+                QString s_type = el.attribute ("type");
+
+                if (s_type == "group") {
+                    b_subitems = loadXMLGroup (el, grp);
+                } else if (s_type == "snippet") {
+                    b_subitems = loadXMLSnip (el, grp);
+                } else {
+                    if (s_type.isEmpty ()) {
+                        s_type = QObject::tr("(empty)");
+                    }
+                    PilesGui::showError (
+                                QObject::tr (
+                                    "The xml document is invalid;\ninvalid type %1")
+                                .arg (s_type));
+                    b_subitems = false;
+                    break;
+                }
+                if (!b_subitems) break;
+            }
+        }
+        if (!b_subitems) break;
+
+        QString s_expanded = el_grp.attribute ("expanded");
+        grp->setExpanded (s_expanded == "true");
+
+        b_ret = true;
+        break;
+    }
+
+    return b_ret;
+}
+
+bool SnipModel::loadXML (QDomDocument &document)
+{
+    bool b_ret = false;
+    for (;;) {
+        if (document.isNull ()) {
+            PilesGui::showError (
+                        QObject::tr ("The xml document is invalid"));
+            break;
+        }
+
+        QDomElement root = document.documentElement ();
+        if (root.isNull ()) {
+            PilesGui::showError (
+                        QObject::tr ("The xml document is invalid"));
+            break;
+        }
+
+        bool b_subitems = true;
+
+        QDomNodeList nl = root.childNodes ();
+        int i_max = nl.count ();
+        for (int i = 0; i < i_max; ++i) {
+            const QDomNode & e (nl.at (i));
+            if (e.isElement ()) {
+                const QDomElement el = e.toElement ();
+                QString s_type = el.attribute ("type");
+                if (s_type == "group") {
+                    b_subitems = loadXMLGroup (el, root_);
+                } else if (s_type == "snippet") {
+                    b_subitems = loadXMLSnip (el, root_);
+                } else {
+                    if (s_type.isEmpty ()) {
+                        s_type = QObject::tr("(empty)");
+                    }
+                    PilesGui::showError (
+                                QObject::tr (
+                                    "The xml document is invalid;\ninvalid type %1")
+                                .arg (s_type));
+                    b_subitems = false;
+                    break;
+                }
+                if (!b_subitems) break;
+            }
+        }
+        if (!b_subitems) break;
+        root_->setExpanded (true);
+
+        b_ret = true;
+        break;
+    }
+
+    return b_ret;
+}
+
+bool SnipModel::saveXML (QDomDocument &document)
+{
+    bool b_ret = false;
+    for (;;) {
+
+        if (document.isNull ()) {
+            PilesGui::showError (
+                        QObject::tr ("The xml document is invalid"));
+            break;
+        }
+
+        QDomProcessingInstruction header =
+                document.createProcessingInstruction(
+                    "xml", "version=\"1.0\" encoding=\"UTF-8\"");
+        document.appendChild (header);
+
+        QDomElement root = document.createElement ("snippets");
+        document.appendChild(root);
+
+        QTreeWidgetItem * tvi;
+        int i_max = root_->childCount ();
+        bool b_intermed = true;
+        for (int i = 0; i < i_max; ++i) {
+            tvi = root_->child (i);
+            SnipItem * item = static_cast<SnipItem *>(tvi);
+            if (item->isGrup ()) {
+                SnipGroup * grp = static_cast<SnipGroup *>(item);
+                b_intermed = saveXMLGroup (root, grp);
+            } else {
+                SnipSnip * snip = static_cast<SnipSnip *>(item);
+                b_intermed = saveXMLSnip (root, snip);
+            }
+            if (!b_intermed) break;
+        }
+        if (!b_intermed) break;
+
+        b_ret = true;
+        break;
+    }
+
+    return b_ret;
+}
+
+void SnipModel::saveToItem (
+        SnipItem * item, const QString & s_name,
+        const QString & s_icon, const QString & s_content )
+{
+    if (item == NULL) return;
+    if (item->parent () == NULL) return;
+
+    item->setName (s_name);
+    item->setIcon (s_icon);
+    if (item->isGrup ()) {
+        //SnipGroup * grp = static_cast<SnipGroup *>(item);
+    } else {
+        SnipSnip * snp = static_cast<SnipSnip *>(item);
+        snp->setContent (s_content);
     }
 }
 
 
-
-Qt::ItemFlags SnipModel::flags(const QModelIndex &index) const
+void SnipModel::getFromItem (
+        SnipItem * item, QString & s_name,
+        QString & s_icon, QString & s_content )
 {
-    if (!index.isValid())
-        return Qt::ItemIsEnabled;
+    s_name.clear ();
+    s_icon.clear ();
+    s_content.clear ();
 
-    SnipItem *item = static_cast<SnipItem*>(index.internalPointer());
+    if (item == NULL) return;
+    if (item->parent () == NULL) return;
 
-    return QAbstractItemModel::flags(index);
+    s_name = item->text (0);
+    s_icon = item->iconString ();
 
-    if (item->node().toElement ().tagName()=="group")
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable|
-                Qt::ItemIsEditable ;
-    else
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable|
-                Qt::ItemIsEditable |Qt::ItemIsDragEnabled;
+    if (item->isGrup ()) {
+        //SnipGroup * grp = static_cast<SnipGroup *>(item);
+    } else {
+        SnipSnip * snp = static_cast<SnipSnip *>(item);
+        s_content = snp->content ();
+    }
 }
 
-
-
-QVariant SnipModel::headerData(int section, Qt::Orientation orientation,
-                              int role) const
+bool SnipModel::addGroup (
+        const QString & s_name, SnipGroup * parent)
 {
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-        switch (section) {
-            case 0:
-                return tr("Name");
-            case 1:
-                return tr("Attributes");
-            case 2:
-                return tr("Value");
-            default:
-                return QVariant();
-        }
+    bool b_ret = false;
+    for (;;) {
+        if (parent == NULL) break;
+        if (!parent->isGrup ()) break;
+
+        SnipGroup * tvi = new SnipGroup ();
+        tvi->setText (0, s_name);
+        parent->insertChild (parent->childCount (), tvi);
+
+        tv_->setCurrentItem (tvi);
+        tv_->scrollToItem (tvi);
+        b_ret = true;
+        break;
     }
 
-    return QVariant();
+    return b_ret;
 }
 
-
-
-QModelIndex SnipModel::index(int row, int column, const QModelIndex &parent)
-            const
-{
-    if (!hasIndex(row, column, parent))
-        return QModelIndex();
-
-    SnipItem *parentItem;
-
-    if (!parent.isValid())
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<SnipItem*>(parent.internalPointer());
-
-
-
-    SnipItem *childItem = parentItem->child(row);
-    if (childItem)
-        return createIndex(row, column, childItem);
-    else
-        return QModelIndex();
-}
-
-
-
-QModelIndex SnipModel::parent(const QModelIndex &child) const
-{
-    if (!child.isValid())
-        return QModelIndex();
-
-    SnipItem *childItem = static_cast<SnipItem*>(child.internalPointer());
-    SnipItem *parentItem = childItem->parent();
-
-    if (!parentItem || parentItem == rootItem)
-        return QModelIndex();
-
-    return createIndex(parentItem->row(), 0, parentItem);
-}
-
-int SnipModel::rowCount(const QModelIndex &parent) const
-{
-    if (parent.column() > 0)
-        return 0;
-
-    SnipItem *parentItem;
-
-    if (!parent.isValid())
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<SnipItem*>(parent.internalPointer());
-
-    return parentItem->node().childNodes().count();
-}
-
-
-bool SnipModel::setData( const QModelIndex &index, const QVariant &value,
-                        int role  )
-{
-    SnipItem *item = static_cast< SnipItem*>(index.internalPointer());
-    switch( role )
-    {
-    case Qt::EditRole:
-    {
-        switch( index.column() )
-        {
-        case 0:{
-            //item->SetNodeName(value.toString());
-            break;}
-        case 1:
-        {
-            //item->SetNodeCost(value.toString());
-            break;
-        }
-        case 2:
-        {
-            //qDebug()<< value.toStringList();
-            // item->SetBold(value.toBool());
-            break;
-        }
-        case 3:
-        {
-            //item->SetHidden(value.toBool());
-            break;
-        }
-        default:
-            break;
-        }
-    }
-    }
-    emit dataChanged( index, index );
-    return true;
-}
-
-bool  SnipModel::AddRootGroup(
+bool SnipModel::addRootGroup (
         const QString & s_name)
 {
+    return addGroup (s_name, root_);
+}
+
+bool SnipModel::addSnip (
+        const QString & s_name, SnipGroup * parent)
+{
     bool b_ret = false;
     for (;;) {
-        QDomElement newSection =
-                rootItem->node().ownerDocument().createElement("group");
-        newSection.setAttribute ("name", s_name);
+        if (parent == NULL) break;
+        if (!parent->isGrup ()) break;
 
-        beginInsertRows (QModelIndex(),1,1);
-        rootItem->node().appendChild (newSection);
-        endInsertRows();
-        emit dataChanged( QModelIndex(),  QModelIndex());
+        SnipSnip * tvi = new SnipSnip ();
+        tvi->setText (0, s_name);
+        parent->insertChild (parent->childCount (), tvi);
 
+        tv_->setCurrentItem (tvi);
+        tv_->scrollToItem (tvi);
         b_ret = true;
         break;
     }
@@ -218,123 +382,48 @@ bool  SnipModel::AddRootGroup(
     return b_ret;
 }
 
-bool  SnipModel::AddGroup(const QModelIndex &index, const QString & s_name)
+SnipItem * SnipModel::currentItem ()
+{
+    QTreeWidgetItem * tvi = tv_->currentItem ();
+    if (tvi == NULL) return NULL;
+    return static_cast<SnipItem *>(tvi);
+}
+
+SnipGroup * SnipModel::currentGroup ()
+{
+    QTreeWidgetItem * tvi = tv_->currentItem ();
+    if (tvi == NULL) return NULL;
+    SnipItem * si = static_cast<SnipItem *>(tvi);
+    if (si->isGrup ()) return static_cast<SnipGroup *>(si);
+    return si->parentSnip ();
+}
+
+bool SnipModel::removeItem (SnipItem * msel)
 {
     bool b_ret = false;
     for (;;) {
+        if (msel == NULL) {
+            PilesGui::showError (
+                        QObject::tr (
+                            "Nothing selected"));
+            break;
+        }
 
+        if (msel->parent () == NULL) {
+            PilesGui::showError (
+                        QObject::tr (
+                            "Can't delete the root group"));
+            break;
+        }
+
+        int i = msel->parent ()->indexOfChild (msel);
+        msel->parent ()->takeChild (i);
+        delete msel;
 
         b_ret = true;
         break;
     }
 
     return b_ret;
-
-    QDomElement newSection=rootItem->node().ownerDocument().createElement("group");
-    beginInsertRows(QModelIndex(),1,1);
-    int i=0;
-    while(IsUnicName(rootItem->node().toElement (),tr("Group%1").arg(i))==false)
-    {
-        i++;
-    }
-
-
-    newSection.setAttribute("name",tr("Group%1").arg(i));
-    rootItem->node().appendChild(newSection);
-    endInsertRows();
-    emit dataChanged( index,  index);
-}
-
-
-void  SnipModel::AddItm(const QModelIndex &index, const QString & s_name)
-{
-    if (index.isValid()==true)
-    {
-        SnipItem *item = static_cast< SnipItem*>(index.internalPointer());
-        if(item->node().toElement ().tagName()=="group")
-        {
-            QDomElement newSection=item->node().ownerDocument().createElement("itm");
-            beginInsertRows(index,1,1);
-            int i=0;
-            while(IsUnicName(item->node().toElement (),tr("item%1").arg(i))==false)
-            {
-                i++;
-            }
-            newSection.setAttribute("name",tr("item%1").arg(i));
-            item->node().appendChild(newSection);
-            endInsertRows();
-            emit dataChanged( index,  index);
-        }
-    }
-}
-
-
-bool SnipModel::IsUnicName(QDomElement node,QString name)
-{
-    for(int i=0;i<node.childNodes().count();i++)
-    {
-        if (node.childNodes().at(i).toElement().attribute("name")==name)
-            return false;
-        if(node.childNodes().at(i).hasChildNodes()==true)
-            if( IsUnicName(node.childNodes().at(i).toElement(),name)==false)
-                return false;
-    }
-    return true;
-}
-
-
-void SnipModel::Remove(const QModelIndex &index)
-{
-    if (index.isValid()==true)
-    {
-        SnipItem *item = static_cast< SnipItem*>(index.internalPointer());
-        if(item->node().childNodes().count()>0)
-        {
-            //emit this->CannotRemove(tr("remove All children first"));
-            return;
-        }
-        else
-        {
-            SnipItem *parent=item->parent();
-            beginRemoveRows(index,index.row(),index.row());
-            parent->RemoveChildren(item);
-            removeRow(index.row(),index);
-            endRemoveRows();
-            emit dataChanged( QModelIndex(), QModelIndex());
-
-        }
-    }
-}
-
-
-Qt::DropActions SnipModel::supportedDragActions () const
-{
-    return Qt::CopyAction;
-}
-
-QStringList SnipModel::mimeTypes() const
-{
-    QStringList types;
-    types << "application/itm";
-    return types;
-}
-
-QMimeData *SnipModel::mimeData(const QModelIndexList &indexes) const
-{
-    QMimeData *mimeData = new QMimeData();
-    QByteArray encodedData;
-
-    QDataStream stream(&encodedData, QIODevice::WriteOnly);
-
-    foreach (const QModelIndex &index, indexes) {
-        if (index.isValid()) {
-            SnipItem *item = static_cast< SnipItem*>(index.internalPointer());
-            stream <<item->parent()->NodeName() ;
-            stream <<item->NodeName() ;
-            stream <<item->NodeCost() ;
-        }
-    }
-    mimeData->setData("application/itm", encodedData);
-    return mimeData;
 }
 

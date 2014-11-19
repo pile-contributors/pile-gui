@@ -5,102 +5,57 @@
 #include <QtXml>
 
 
-SnipItem::SnipItem(QDomElement &node, int row, SnipItem *parent)
+SnipItem::SnipItem() : QTreeWidgetItem()
 {
-    domNode = node;
-
-    // Record the item's location within its parent.
-
-    rowNumber = row;
-    parentItem = parent;
+    setFlags (Qt::ItemIsUserCheckable |
+              Qt::ItemIsSelectable |
+              Qt::ItemIsEnabled);
+    //setDefaultIcon ();
 }
-
-
 
 SnipItem::~SnipItem()
 {
-    QHash<int,SnipItem*>::iterator it;
-    for (it = childItems.begin(); it != childItems.end(); ++it)
-        delete it.value();
+    QTreeWidgetItem * tvi;
+    int i_max = childCount ();
+    for (int i = 0; i < i_max; ++i) {
+        tvi = takeChild (0);
+        delete tvi;
+    }
 }
 
-
-
-QDomElement SnipItem::node() const
+SnipGroup * SnipItem::parentSnip()
 {
-    return domNode;
+    QTreeWidgetItem * tvi = parent();
+    if (tvi == NULL) return NULL;
+    return static_cast<SnipGroup *>(tvi);
 }
 
-
-
-SnipItem *SnipItem::parent()
+void SnipItem::setDefaultIcon ()
 {
-    return parentItem;
-}
-
-
-
-SnipItem *SnipItem::child (int i)
-{
-    if (childItems.contains(i))
-        return childItems[i];
-
-    if (i >= 0 && i < domNode.childNodes().count()) {
-        QDomNode childNode = domNode.childNodes().item(i);
-        if (childNode.isElement ()) {
-            QDomElement child_element = childNode.toElement ();
-
-            SnipItem *childItem = new SnipItem (child_element, i, this);
-            childItems[i] = childItem;
-            return childItem;
+    if (isGrup ()) {
+        //QIcon ic_res ("G:/prog-archive/fatcow-hosting-icons-3800/FatCow_Icons16x16/folder.png");
+        QIcon ic_res (":/icons/resources/icons/folder.png");
+        if (!ic_res.isNull ()) {
+            QTreeWidgetItem::setIcon (0, ic_res);
+        }
+    } else {
+        //QIcon ic_res ("G:/prog-archive/fatcow-hosting-icons-3800/FatCow_Icons16x16/text.png");
+        QIcon ic_res (":/icons/resources/icons/text.png");
+        if (!ic_res.isNull ()) {
+            QTreeWidgetItem::setIcon (0, ic_res);
         }
     }
-    return 0;
 }
 
-
-
-int SnipItem::row()
+void SnipItem::setIcon (const QString & s_value)
 {
-    return rowNumber;
-}
-
-void SnipItem::RemoveChildren(SnipItem *node)
-{
-    this->node().removeChild(node->node());
-    foreach(int i, childItems.keys ()) {
-        if (childItems.value (i) == node) {
-            childItems.remove (i);
-        }
+    if (s_value.isEmpty ()) setDefaultIcon ();
+    if (s_icon_ == s_value) return;
+    s_icon_ = s_value;
+    QIcon ic (s_value);
+    if (ic.isNull ()) {
+        setDefaultIcon ();
+    } else {
+        QTreeWidgetItem::setIcon(0, ic);
     }
-    //    childItems.clear();
-}
-
-
-void SnipItem::SetNodeName(QString name)
-{
-    if(name.isEmpty()==false)
-    {
-        node().toElement ().setAttribute("name",name);
-    }
-}
-
-
-
-void SnipItem::SetNodeCost(QString cost)
-{
-    if(cost.isEmpty()==false)
-    {
-        node().toElement ().setAttribute("cost",cost);
-    }else
-        node().toElement ().setAttribute("cost",0);
-}
-
-
-QString SnipItem::NodeName(){
-    return node().toElement ().attribute("name");
-}
-
-QString SnipItem::NodeCost(){
-    return node().toElement ().attribute("cost");
 }

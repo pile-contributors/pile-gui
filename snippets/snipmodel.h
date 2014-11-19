@@ -1,49 +1,56 @@
 #ifndef SNIPMODEL_H
 #define SNIPMODEL_H
 
-#include <QAbstractItemModel>
-#include <QDomDocument>
-#include <QModelIndex>
+#include "snipitem.h"
 
 class SnipItem;
+class QDomDocument;
+class QDomElement;
 
-class SnipModel : public QAbstractItemModel
+class SnipModel
 {
-    Q_OBJECT
-
 public:
-    explicit SnipModel(QDomDocument document, QObject *parent = 0);
-    ~SnipModel();
 
-    QVariant data(const QModelIndex &index, int role) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    QVariant headerData(int section, Qt::Orientation orientation,
-                        int role = Qt::DisplayRole) const;
-    QModelIndex index(int row, int column,
-                      const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex parent(const QModelIndex &child) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    SnipModel (QTreeWidget * tv);
+    SnipModel (QTreeWidget * tv, QDomDocument & document);
+    virtual ~SnipModel ();
 
-    void Remove(const QModelIndex &index);
-    bool IsUnicName(QDomElement node, QString name);
-    void AddItm(const QModelIndex &index, const QString & s_name);
-    bool AddGroup(const QModelIndex &index, const QString & s_name);
-    bool AddRootGroup (const QString & s_name);
+    bool
+    addGroup (
+            const QString & s_name,
+            SnipGroup * parent);
 
-    QDomDocument &
-    domDocument () {
-        return dom_document_;
-    }
+    bool
+    addRootGroup (
+            const QString & s_name);
 
-protected:
-    QMimeData *mimeData(const QModelIndexList &indexes) const;
-    QStringList mimeTypes() const;
-    Qt::DropActions supportedDragActions() const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
+    bool
+    loadXML (
+            QDomDocument & document);
+
+    bool
+    saveXML (
+            QDomDocument & document);
+
+    bool
+    addSnip (
+            const QString & s_name,
+            SnipGroup * parent);
+
+    SnipGroup * root_;
+    QTreeWidget * tv_;
+    SnipItem *currentItem();
+    SnipGroup *currentGroup();
+    bool removeItem(SnipItem *msel);
+    void saveToItem(SnipItem *item, const QString &s_name, const QString &s_icon, const QString &s_content);
+    void getFromItem(SnipItem *item, QString &s_name, QString &s_icon, QString &s_content);
 private:
-    QDomDocument dom_document_;
-    SnipItem *rootItem;
+    bool loadXMLitem(const QDomElement &el, SnipItem *it);
+    bool loadXMLSnip(const QDomElement &el, SnipGroup *parent);
+    bool loadXMLGroup(const QDomElement &el_grp, SnipGroup *parent);
+    bool saveXMLGroup(QDomElement &el_parent, SnipGroup *grp);
+    bool saveXMLSnip(QDomElement &el_parent, SnipSnip *snip);
+    QDomElement saveXMLItem(QDomElement &el_parent, SnipItem *item);
 };
 
 #endif // SNIPMODEL_H

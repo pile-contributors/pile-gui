@@ -48,7 +48,9 @@ SOURCES += main.cpp\
     support/waiter.cpp \
     snippetsdlg.cpp \
     snippets/snipmodel.cpp \
-    snippets/snipitem.cpp
+    snippets/snipitem.cpp \
+    envdlg.cpp \
+    editors/codeeditor.cc
 
 HEADERS  += mainwindow.h \
     setting_names.h \
@@ -70,7 +72,9 @@ HEADERS  += mainwindow.h \
     support/waiter.h \
     snippetsdlg.h \
     snippets/snipmodel.h \
-    snippets/snipitem.h
+    snippets/snipitem.h \
+    envdlg.h \
+    editors/codeeditor.h
 
 FORMS    += mainwindow.ui \
     pileslist.ui \
@@ -78,7 +82,8 @@ FORMS    += mainwindow.ui \
     newpiledlg.ui \
     custcmddlg.ui \
     copyreplacedlg.ui \
-    snippetsdlg.ui
+    snippetsdlg.ui \
+    envdlg.ui
 
 RESOURCES += \
     appres.qrc

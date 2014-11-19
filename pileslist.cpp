@@ -38,31 +38,31 @@ QTreeWidgetItem * PilesList::insertProvider (
         tvi->setIcon (
                     0,
                     QIcon(
-                        ":/resources/icons/text.png"));
+                        ":/icons/resources/icons/text.png"));
         break;}
     case PROV_XML: {
         tvi->setIcon (
                     0,
                     QIcon(
-                        ":/resources/icons/xml_imports.png"));
+                        ":/icons/resources/icons/xml_imports.png"));
         break;}
     case PROV_REMOTE: {
         tvi->setIcon (
                     0,
                     QIcon(
-                        ":/resources/icons/link.png"));
+                        ":/icons/resources/icons/link.png"));
         break;}
     case PROV_DIR: {
         tvi->setIcon (
                     0,
                     QIcon(
-                        ":/resources/icons/folder.png"));
+                        ":/icons/resources/icons/folder.png"));
         break;}
     case PROV_USER: {
         tvi->setIcon (
                     0,
                     QIcon(
-                        ":/resources/icons/user_red.png"));
+                        ":/icons/resources/icons/user_red.png"));
         break;}
     default: {
         // TODO debug assert
