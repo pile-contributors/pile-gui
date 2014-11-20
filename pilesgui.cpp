@@ -20,7 +20,8 @@ PilesGui::PilesGui(QObject *parent) :
     QObject(parent),
     w(NULL),
     d(NULL),
-    pc(NULL)
+    pc(NULL),
+    envp_(QProcessEnvironment::systemEnvironment())
 {   
     uniq_ = this;
 }

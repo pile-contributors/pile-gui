@@ -12,7 +12,6 @@
 #include <QTextStream>
 #include <QMenu>
 #include <QMessageBox>
-
 #include <QProcessEnvironment>
 
 class EnvItem : public QTreeWidgetItem
@@ -49,6 +48,11 @@ public:
         setText (1, s_value);
     }
 
+    QString
+    value () {
+        return text (1);
+    }
+
     bool
     newlyCreated () {
         return is_new_;
@@ -58,11 +62,6 @@ public:
     setNewlyCreated (
             bool value) {
         is_new_ = value;
-    }
-
-    QString
-    value () {
-        return text (1);
     }
 
     bool is_new_;
@@ -108,13 +107,18 @@ EnvDlg::EnvDlg(QWidget *parent) :
 EnvDlg::~EnvDlg()
 {
     clearAll ();
+    clearToDelete ();
 
+
+    delete ui;
+}
+
+void EnvDlg::clearToDelete()
+{
     foreach(EnvItem * item, to_delete_) {
         delete item;
     }
     to_delete_.clear ();
-
-    delete ui;
 }
 
 void EnvDlg::loadEnvironment()
@@ -276,6 +280,7 @@ void EnvDlg::on_actionCreate_new_variable_triggered()
     EnvItem * itm = new EnvItem ();
     itm->setName (tr("NEW_VARIABLE"));
     itm->setValue (tr("VALUE"));
+    itm->setNewlyCreated (true);
     ui->tv_content->addTopLevelItem (itm);
 
     ui->tv_content->scrollToItem (itm);
@@ -290,4 +295,26 @@ void EnvDlg::on_actionRemove_variable_triggered()
 
     EnvItem * sp = static_cast<EnvItem*>(tvi);
     to_delete_.append (ap);
+}
+
+void EnvDlg::on_buttonBox_accepted()
+{
+    QProcessEnvironment envp =
+            QProcessEnvironment::systemEnvironment();
+
+
+    int i_max = ui->tv_content->topLevelItemCount ();
+    for (int i = 0; i < i_max; ++i) {
+        QTreeWidgetItem * tvi = ui->tv_content->topLevelItem (1);
+        EnvItem * envv = static_cast<EnvItem *>(tvi);
+
+    }
+
+    foreach(EnvItem * item, to_delete_) {
+
+    }
+
+    clearToDelete ();
+
+    accept();
 }

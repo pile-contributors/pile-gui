@@ -36,6 +36,8 @@ private slots:
 
     void on_actionRemove_variable_triggered();
 
+    void on_buttonBox_accepted();
+
 private:
     void loadEnvironment();
     void clearAll();
@@ -44,6 +46,7 @@ private:
 private:
     Ui::EnvDlg *ui;
     QList<EnvItem*> to_delete_;
+    void clearToDelete();
 };
 
 #endif // ENVDLG_H

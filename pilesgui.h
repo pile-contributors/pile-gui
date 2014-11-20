@@ -2,6 +2,7 @@
 #define PILESGUI_H
 
 #include <QObject>
+#include <QProcessEnvironment>
 
 class MainWindow;
 class Downloader;
@@ -37,6 +38,12 @@ public:
     showError (
             const QString &s_message);
 
+    static QProcessEnvironment &
+    processEnvironment () {
+        return envp_;
+    }
+
+
 signals:
 
 public slots:
@@ -45,6 +52,7 @@ private:
     MainWindow * w;
     Downloader * d;
     PileContainer * pc;
+    QProcessEnvironment envp_;
     static PilesGui * uniq_;
 };
 
