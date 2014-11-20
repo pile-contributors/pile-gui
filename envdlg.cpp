@@ -317,7 +317,7 @@ void EnvDlg::on_buttonBox_accepted()
 
     int i_max = ui->tv_content->topLevelItemCount ();
     for (int i = 0; i < i_max; ++i) {
-        QTreeWidgetItem * tvi = ui->tv_content->topLevelItem (1);
+        QTreeWidgetItem * tvi = ui->tv_content->topLevelItem (i);
         EnvItem * envv = static_cast<EnvItem *>(tvi);
         env.insert (envv->name (), envv->value ());
     }
