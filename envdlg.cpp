@@ -104,9 +104,10 @@ EnvDlg::EnvDlg(QWidget *parent) :
 
     QSettings s;
 
+
     restoreGeometry (
                 s.value(
-                    STG_ENV_STATE).toByteArray());
+                    STG_ENV_GEOMETRY).toByteArray());
     ui->tv_content->header()->restoreState (
                 s.value(
                     STG_ENV_TV_STATE).toByteArray());
@@ -121,6 +122,19 @@ EnvDlg::~EnvDlg()
 
 
     delete ui;
+}
+
+void EnvDlg::closeEvent(QCloseEvent *)
+{
+
+    saveXMLFile (ui->database_path->text ());
+
+    QSettings s;
+    QByteArray ba_state = saveGeometry ();
+    s.setValue (STG_ENV_GEOMETRY, ba_state);
+    QByteArray ba_hdr = ui->tv_content->header()->saveState ();
+    s.setValue (STG_ENV_TV_STATE, ba_hdr);
+    s.sync ();
 }
 
 void EnvDlg::clearToDelete()
@@ -275,16 +289,6 @@ void EnvDlg::on_tv_content_currentItemChanged(
         ui->variable_name->setText (sp->name());
         ui->variable_name->setEnabled (true);
     }
-}
-
-void EnvDlg::closeEvent(QCloseEvent *)
-{
-
-    saveXMLFile (ui->database_path->text ());
-
-    QSettings s;
-    s.setValue (STG_ENV_GEOMETRY, saveGeometry ());
-    s.setValue (STG_ENV_TV_STATE, ui->tv_content->header()->saveState ());
 }
 
 void EnvDlg::on_actionCreate_new_variable_triggered()

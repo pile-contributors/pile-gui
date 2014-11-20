@@ -68,7 +68,7 @@ SnippetsDlg::SnippetsDlg(QWidget *parent) :
 
     restoreGeometry (
                 s.value(
-                    STG_SNIPP_STATE).toByteArray());
+                    STG_SNIPP_GEOMETRY).toByteArray());
     ui->tv_content->header()->restoreState (
                 s.value(
                     STG_SNIPP_TV_STATE).toByteArray());
@@ -81,6 +81,15 @@ SnippetsDlg::SnippetsDlg(QWidget *parent) :
 SnippetsDlg::~SnippetsDlg()
 {
     delete ui;
+}
+
+void SnippetsDlg::closeEvent(QCloseEvent *)
+{
+    saveXMLFile (ui->database_path->text ());
+
+    QSettings s;
+    s.setValue (STG_SNIPP_GEOMETRY, saveGeometry ());
+    s.setValue (STG_SNIPP_TV_STATE, ui->tv_content->header()->saveState ());
 }
 
 void SnippetsDlg::on_database_browse_clicked()
@@ -308,15 +317,6 @@ void SnippetsDlg::on_tv_content_currentItemChanged(
             ui->tx_content->setEnabled (true);
         }
     }
-}
-
-void SnippetsDlg::closeEvent(QCloseEvent *)
-{
-    saveXMLFile (ui->database_path->text ());
-
-    QSettings s;
-    s.setValue (STG_SNIPP_GEOMETRY, saveGeometry ());
-    s.setValue (STG_SNIPP_TV_STATE, ui->tv_content->header()->saveState ());
 }
 
 void SnippetsDlg::on_b_icon_clicked()
