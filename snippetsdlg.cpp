@@ -146,7 +146,8 @@ bool SnippetsDlg::saveXMLFile (const QString & s_file)
         }
 
         QTreeWidgetItem * tvi = ui->tv_content->currentItem ();
-        on_tv_content_currentItemChanged (tvi, tvi);
+        if (tvi != NULL)
+            on_tv_content_currentItemChanged (tvi, tvi);
 
         // open the file
         QFile file (s_file);
@@ -300,9 +301,6 @@ void SnippetsDlg::on_tv_content_currentItemChanged(
 
 void SnippetsDlg::closeEvent(QCloseEvent *)
 {
-    QTreeWidgetItem * tvi = ui->tv_content->currentItem ();
-    if (tvi != NULL)
-        on_tv_content_currentItemChanged (NULL, tvi);
     saveXMLFile (ui->database_path->text ());
 }
 

@@ -8,7 +8,7 @@ SnipModel::SnipModel (QTreeWidget * tv) :
     tv_(tv)
 {
     root_ = new SnipGroup ();
-    root_->setText (0, QObject::tr ("(no database)"));
+    root_->setText (0, QObject::tr ("Database"));
     tv->addTopLevelItem (root_);
     root_->setDefaultIcon ();
     root_->setFlags (Qt::ItemIsSelectable |
@@ -21,7 +21,7 @@ SnipModel::SnipModel (QTreeWidget * tv, QDomDocument & document) :
     tv_(tv)
 {
     root_ = new SnipGroup ();
-    root_->setText (0, QObject::tr ("(no database)"));
+    root_->setText (0, QObject::tr ("Database"));
     tv->addTopLevelItem (root_);
     root_->setDefaultIcon ();
 
