@@ -124,7 +124,7 @@ void EnvDlg::clearToDelete()
 void EnvDlg::loadEnvironment()
 {
     QProcessEnvironment envp =
-            QProcessEnvironment::systemEnvironment();
+            PilesGui::processEnvironment ();
 
     foreach(const QString & s_name, envp.keys ()) {
         EnvItem * itm = new EnvItem ();
@@ -294,25 +294,22 @@ void EnvDlg::on_actionRemove_variable_triggered()
     ui->tv_content->takeTopLevelItem (i);
 
     EnvItem * sp = static_cast<EnvItem*>(tvi);
-    to_delete_.append (ap);
+    to_delete_.append (sp);
 }
 
 void EnvDlg::on_buttonBox_accepted()
 {
-    QProcessEnvironment envp =
-            QProcessEnvironment::systemEnvironment();
-
+    //    QProcessEnvironment envp =
+    //            PilesGui::processEnvironment ();
+    QProcessEnvironment env;
 
     int i_max = ui->tv_content->topLevelItemCount ();
     for (int i = 0; i < i_max; ++i) {
         QTreeWidgetItem * tvi = ui->tv_content->topLevelItem (1);
         EnvItem * envv = static_cast<EnvItem *>(tvi);
-
+        env.insert (envv->name (), envv->value ());
     }
-
-    foreach(EnvItem * item, to_delete_) {
-
-    }
+    PilesGui::setProcessEnvironment (env);
 
     clearToDelete ();
 

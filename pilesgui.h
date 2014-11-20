@@ -40,13 +40,21 @@ public:
 
     static QProcessEnvironment &
     processEnvironment () {
-        return envp_;
+        return uniq_->envp_;
     }
 
+    static void
+    setProcessEnvironment (
+            QProcessEnvironment & value);
 
 signals:
 
 public slots:
+
+private:
+    void loadEnvironment(const QProcessEnvironment &value);
+    void clearEnvironment(const QProcessEnvironment &value);
+
 
 private:
     MainWindow * w;

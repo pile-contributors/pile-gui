@@ -3,9 +3,11 @@
 #include "downloader.h"
 #include "logic/pilecontainer.h"
 #include "config.h"
+#include "setting_names.h"
 
 #include <QMessageBox>
 #include <QApplication>
+#include <QSettings>
 
 #ifdef PILESGUI_WINDOWS
 #   include <windows.h>
@@ -32,6 +34,7 @@ PilesGui::~PilesGui()
 
 bool PilesGui::start()
 {
+    QSettings stg;
 
 #   ifdef PILESGUI_DEBUG
 #   ifdef PILESGUI_WINDOWS
@@ -63,6 +66,13 @@ bool PilesGui::start()
     w->show();
     w->afterShown();
 
+    QString s_env_file = stg.value (STG_ENVAR_DB).toString ();
+    if (!s_env_file.isEmpty ()) {
+        // TODO
+
+    }
+
+
     return true;
 }
 
@@ -77,5 +87,27 @@ void PilesGui::showError (const QString & s_message)
                 QApplication::activeWindow (),
                 tr("Error"),
                 s_message);
+}
+
+void PilesGui::loadEnvironment(const QProcessEnvironment &value)
+{
+    foreach(const QString & k, value.keys ()) {
+        qputenv (k.toLatin1 ().constData (), value.value (k).toLatin1 ());
+    }
+}
+
+void PilesGui::clearEnvironment(const QProcessEnvironment &value)
+{
+    foreach(const QString & k, value.keys ()) {
+        qunsetenv (k.toLatin1 ().constData ());
+    }
+}
+
+void PilesGui::setProcessEnvironment(QProcessEnvironment &value)
+{
+    uniq_->clearEnvironment (uniq_->envp_);
+    uniq_->loadEnvironment (value);
+
+    uniq_->envp_ = value;
 }
 

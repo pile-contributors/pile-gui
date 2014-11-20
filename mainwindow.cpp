@@ -10,6 +10,7 @@
 #include "custcmddlg.h"
 #include "copyreplacedlg.h"
 #include "envdlg.h"
+#include "support/programrunner.h"
 
 #include <QSettings>
 #include <QDesktopServices>
@@ -469,14 +470,11 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_btn_open_clicked()
 {
-    QString directory = currentFile ();
-    if (directory.isEmpty ()) {
+    QString selected_entry = currentFile ();
+    if (selected_entry.isEmpty ()) {
         PilesGui::showError (tr("No file selected"));
     } else {
-        QDesktopServices::openUrl(
-                    QUrl (
-                        QString("file:///%1")
-                        .arg(directory)));
+        ProgramRunner::startProgramOrOpenFile (selected_entry);
     }
 }
 

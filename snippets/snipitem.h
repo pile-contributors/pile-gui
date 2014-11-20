@@ -49,7 +49,12 @@ public:
 class SnipGroup : public SnipItem
 {
 public:
-    SnipGroup() {}
+    SnipGroup() {
+        setFlags (Qt::ItemIsSelectable |
+                  Qt::ItemIsEnabled |
+                  Qt::ItemIsDragEnabled |
+                  Qt::ItemIsDropEnabled);
+    }
     virtual ~SnipGroup() {}
 
     virtual bool
@@ -59,7 +64,11 @@ public:
 class SnipSnip : public SnipItem
 {
 public:
-    SnipSnip() {}
+    SnipSnip() {
+        setFlags (Qt::ItemIsSelectable |
+                  Qt::ItemIsEnabled |
+                  Qt::ItemIsDragEnabled);
+    }
     virtual ~SnipSnip() {}
 
     void

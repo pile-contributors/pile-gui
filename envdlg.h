@@ -7,6 +7,13 @@ namespace Ui {
 class EnvDlg;
 }
 
+/**
+ * @TODO the entries should be simply marked as deleted, not actually deleted.
+ * @TODO The file is not saved/loaded
+ * @TODO Start-up code should load the file from settings
+ */
+
+
 class QTreeWidgetItem;
 class EnvItem;
 

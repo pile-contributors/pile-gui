@@ -1,6 +1,9 @@
 #include "programrunner.h"
+#include "pilesgui.h"
 
 #include <QDebug>
+#include <QDesktopServices>
+#include <QUrl>
 
 ProgramRunner::ProgramRunner(QObject *parent) :
     QObject(parent),
@@ -54,8 +57,16 @@ ProgramRunner *ProgramRunner::startProgram(
     }
 
     QProcessEnvironment env =
-            QProcessEnvironment::systemEnvironment();
-    env.insert("TRICKY", "PileGui");
+            PilesGui::processEnvironment ();
+    env.clear ();
+    env.insert("TRICKY1", "PileGui");
+    env.insert("TRICKY2", "PileGui");
+    env.insert("TRICKY3", "PileGui");
+    env.insert("TRICKY4", "PileGui");
+    env.insert("TRICKY5", "PileGui");
+    env.insert("TRICKY6", "PileGui");
+    env.insert("TRICKY7", "PileGui");
+    env.insert("TRICKY8", "PileGui");
     pr->my_process.setProcessEnvironment (env);
 
     // pr->my_process.closeWriteChannel();
@@ -136,5 +147,38 @@ const char * ProgramRunner::stateName(QProcess::ProcessState value)
     case QProcess::Running: state_name = "Running"; break;
     }
     return state_name;
+}
+
+void ProgramRunner::startProgramOrOpenFile (const QString &program)
+{
+#ifdef WIN32
+    if (program.endsWith (".bat") || program.endsWith (".cmd")) {
+//        QProcess * p = new QProcess();
+//        p->setProgram ("cmd.exe");
+
+        QStringList sl;
+        sl << "/C" << program;
+
+        QProcess::startDetached ("cmd.exe", sl);
+
+//        p->setArguments (sl);
+//        p->setProcessEnvironment (PilesGui::processEnvironment ());
+//        p->closeWriteChannel ();
+//        QObject::connect(p, SIGNAL(finished(int)),
+//                         p, SLOT(deleteLater()));
+//        p->start();
+        return;
+    }
+#endif
+
+    // default to a double click, basically
+    QString actual_command = program;
+    if (!actual_command.contains ("://")) {
+        actual_command = QString("file:///%1")
+                .arg (program);
+    }
+    QDesktopServices::openUrl(
+                QUrl (actual_command));
+
 }
 

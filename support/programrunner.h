@@ -80,6 +80,10 @@ public:
     stateName(
             QProcess::ProcessState value);
 
+    static void
+    startProgramOrOpenFile (
+            const QString & program);
+
 };
 
 #endif // PROGRAMRUNNER_H
