@@ -166,6 +166,32 @@ alternate-background-color: rgb(246, 255, 249);</string>
     <property name="title">
      <string>View</string>
     </property>
+    <widget class="QMenu" name="menuToolbars">
+     <property name="title">
+      <string>Toolbars</string>
+     </property>
+     <addaction name="separator"/>
+    </widget>
+    <widget class="QMenu" name="menuFilter">
+     <property name="title">
+      <string>Filter</string>
+     </property>
+     <addaction name="actionFiles"/>
+     <addaction name="actionDrives"/>
+     <addaction name="actionSymbolic_links"/>
+     <addaction name="separator"/>
+     <addaction name="actionReadable"/>
+     <addaction name="actionWritable"/>
+     <addaction name="actionExecutable"/>
+     <addaction name="separator"/>
+     <addaction name="actionModified"/>
+     <addaction name="actionHidden"/>
+     <addaction name="actionSystem"/>
+     <addaction name="separator"/>
+     <addaction name="actionCase_sensitive"/>
+    </widget>
+    <addaction name="menuToolbars"/>
+    <addaction name="menuFilter"/>
    </widget>
    <addaction name="menuView"/>
   </widget>
@@ -369,6 +395,86 @@ alternate-background-color: rgb(246, 255, 249);</string>
    </property>
    <property name="toolTip">
     <string>Show and edit environment variables</string>
+   </property>
+  </action>
+  <action name="actionFiles">
+  <property name="checkable">
+   <bool>true</bool>
+  </property>
+   <property name="text">
+    <string>Files</string>
+   </property>
+  </action>
+  <action name="actionDrives">
+  <property name="checkable">
+   <bool>true</bool>
+  </property>
+   <property name="text">
+    <string>Drives</string>
+   </property>
+  </action>
+  <action name="actionSymbolic_links">
+  <property name="checkable">
+   <bool>true</bool>
+  </property>
+   <property name="text">
+    <string>Symbolic links</string>
+   </property>
+  </action>
+  <action name="actionReadable">
+  <property name="checkable">
+   <bool>true</bool>
+  </property>
+   <property name="text">
+    <string>Readable</string>
+   </property>
+  </action>
+  <action name="actionWritable">
+  <property name="checkable">
+   <bool>true</bool>
+  </property>
+   <property name="text">
+    <string>Writable</string>
+   </property>
+  </action>
+  <action name="actionExecutable">
+  <property name="checkable">
+   <bool>true</bool>
+  </property>
+   <property name="text">
+    <string>Executable</string>
+   </property>
+  </action>
+  <action name="actionModified">
+  <property name="checkable">
+   <bool>true</bool>
+  </property>
+   <property name="text">
+    <string>Modified</string>
+   </property>
+  </action>
+  <action name="actionHidden">
+  <property name="checkable">
+   <bool>true</bool>
+  </property>
+   <property name="text">
+    <string>Hidden</string>
+   </property>
+  </action>
+  <action name="actionSystem">
+  <property name="checkable">
+   <bool>true</bool>
+  </property>
+   <property name="text">
+    <string>System</string>
+   </property>
+  </action>
+  <action name="actionCase_sensitive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Case sensitive</string>
    </property>
   </action>
  </widget>

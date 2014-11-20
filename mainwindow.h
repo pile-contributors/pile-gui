@@ -87,6 +87,26 @@ private slots:
 
     void on_actionEnvironment_Variables_triggered();
 
+    void on_actionFiles_triggered(bool checked);
+
+    void on_actionDrives_triggered(bool checked);
+
+    void on_actionSymbolic_links_triggered(bool checked);
+
+    void on_actionReadable_triggered(bool checked);
+
+    void on_actionWritable_triggered(bool checked);
+
+    void on_actionExecutable_triggered(bool checked);
+
+    void on_actionModified_triggered(bool checked);
+
+    void on_actionHidden_triggered(bool checked);
+
+    void on_actionSystem_triggered(bool checked);
+
+    void on_actionCase_sensitive_triggered(bool checked);
+
 private:
     Ui::MainWindow *ui;
     QFileSystemModel *model;

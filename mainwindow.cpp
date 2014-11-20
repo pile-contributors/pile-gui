@@ -27,6 +27,7 @@
 #define NAVIGATE_BACK true
 #define NAVIGATE_FORW false
 #define GET_NAV_DIR(__act__) __act__->data ().toBool ()
+#define MANDATORY_QDIR_FILTER (QDir::AllDirs | QDir::NoDotAndDotDot)
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -39,6 +40,22 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     model->setRootPath (QDir::rootPath ());
+
+
+
+    model->setFilter (MANDATORY_QDIR_FILTER |
+                      QDir::Files |
+                      QDir::Drives |
+                      QDir::NoSymLinks |
+
+                      QDir::Readable |
+                      QDir::Writable |
+                      QDir::Executable |
+
+                      QDir::Modified |
+                      QDir::Hidden |
+                      QDir::System);
+
     ui->treeView->setModel (model);
     ui->treeView->setSortingEnabled (true);
     my_comp_index = ui->treeView->rootIndex ();
@@ -48,7 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
              this,
              SLOT(fileListSelectionChanged(const QModelIndex &, const QModelIndex &)));
 
-    ui->menuView->addAction (
+    ui->menuToolbars->clear ();
+    ui->menuToolbars->addAction (
                 ui->mainToolBar->toggleViewAction ());
 
     loadSettings();
@@ -239,6 +257,22 @@ void MainWindow::loadSettings ()
     ui->treeView->header()->restoreState (
                 s.value(
                     STG_TV_STATE).toByteArray());
+
+    QDir::Filters filfiltt = (QDir::Filters) (MANDATORY_QDIR_FILTER | s.value(
+        STG_TV_FILTER, (int)model->filter ()).toInt ());
+     model->setFilter (filfiltt);
+
+    ui->actionFiles->setChecked ((filfiltt & QDir::Files) != 0);
+    ui->actionDrives->setChecked ((filfiltt & QDir::Drives) != 0);
+    ui->actionSymbolic_links->setChecked ((filfiltt & QDir::NoSymLinks) != 0);
+    ui->actionReadable->setChecked ((filfiltt & QDir::Readable) != 0);
+    ui->actionWritable->setChecked ((filfiltt & QDir::Writable) != 0);
+    ui->actionExecutable->setChecked ((filfiltt & QDir::Executable) != 0);
+    ui->actionModified->setChecked ((filfiltt & QDir::Modified) != 0);
+    ui->actionHidden->setChecked ((filfiltt & QDir::Hidden) != 0);
+    ui->actionSystem->setChecked ((filfiltt & QDir::System) != 0);
+    ui->actionCase_sensitive->setChecked ((filfiltt & QDir::CaseSensitive) != 0);
+
 }
 
 void MainWindow::saveSettings ()
@@ -249,6 +283,8 @@ void MainWindow::saveSettings ()
     s.setValue (STG_MW_STATE, saveState ());
 
     s.setValue (STG_TV_STATE, ui->treeView->header()->saveState ());
+    s.setValue (STG_TV_FILTER, (int)model->filter());
+
 }
 
 QStringList parseCombinedArgString(const QString &program)
@@ -719,4 +755,84 @@ void MainWindow::on_actionEnvironment_Variables_triggered()
 {
     EnvDlg dlg;
     dlg.exec ();
+}
+
+void MainWindow::on_actionFiles_triggered(bool checked)
+{
+    model->setFilter (
+                checked ?
+                model->filter () | QDir::Files :
+                model->filter () & (~QDir::Files));
+}
+
+void MainWindow::on_actionDrives_triggered(bool checked)
+{
+    model->setFilter (
+                checked ?
+                model->filter () | QDir::Drives :
+                model->filter () & (~QDir::Drives));
+}
+
+void MainWindow::on_actionSymbolic_links_triggered(bool checked)
+{
+    model->setFilter (
+                !checked ?
+                model->filter () | QDir::NoSymLinks :
+                model->filter () & (~QDir::NoSymLinks));
+}
+
+void MainWindow::on_actionReadable_triggered(bool checked)
+{
+    model->setFilter (
+                checked ?
+                model->filter () | QDir::Readable :
+                model->filter () & (~QDir::Readable));
+}
+
+void MainWindow::on_actionWritable_triggered(bool checked)
+{
+    model->setFilter (
+                checked ?
+                model->filter () | QDir::Writable :
+                model->filter () & (~QDir::Writable));
+}
+
+void MainWindow::on_actionExecutable_triggered(bool checked)
+{
+    model->setFilter (
+                checked ?
+                model->filter () | QDir::Executable :
+                model->filter () & (~QDir::Executable));
+}
+
+void MainWindow::on_actionModified_triggered(bool checked)
+{
+    model->setFilter (
+                checked ?
+                model->filter () | QDir::Modified :
+                model->filter () & (~QDir::Modified));
+}
+
+void MainWindow::on_actionHidden_triggered(bool checked)
+{
+    model->setFilter (
+                checked ?
+                model->filter () | QDir::Hidden :
+                model->filter () & (~QDir::Hidden));
+}
+
+void MainWindow::on_actionSystem_triggered(bool checked)
+{
+    model->setFilter (
+                checked ?
+                model->filter () | QDir::System :
+                model->filter () & (~QDir::System));
+}
+
+void MainWindow::on_actionCase_sensitive_triggered(bool checked)
+{
+    model->setFilter (
+                checked ?
+                model->filter () | QDir::CaseSensitive :
+                model->filter () & (~QDir::CaseSensitive));
 }
