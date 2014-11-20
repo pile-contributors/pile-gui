@@ -23,6 +23,7 @@
 #include	<QDebug>
 #include	<QPainter>
 #include	<QTextBlock>
+#include	<QSettings>
 
 #include	"codeeditor.h"
 
@@ -79,6 +80,27 @@ CodeEditor::CodeEditor	( QWidget * parent ) :
 CodeEditor::~CodeEditor	( void )
 {
 	/* stub */
+}
+/* ========================================================================= */
+
+/* ------------------------------------------------------------------------- */
+bool CodeEditor::saveState (QSettings & stg)
+{
+    stg.setValue ("point_size", font().pointSize ());
+    return true;
+}
+/* ========================================================================= */
+
+/* ------------------------------------------------------------------------- */
+bool CodeEditor::restoreState (QSettings & stg)
+{
+
+    QFont	fnt = font();
+    int pt_sz = stg.value ("point_size", font().pointSize ()).toInt ();
+    fnt.setPointSize (pt_sz);
+    setFont (fnt);
+
+    return true;
 }
 /* ========================================================================= */
 

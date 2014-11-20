@@ -68,6 +68,7 @@ class QPaintEvent;
 class QResizeEvent;
 class QSize;
 class QWidget;
+class QSettings;
 QT_END_NAMESPACE
 
 class LineNumberArea;
@@ -116,18 +117,30 @@ public:
 	/**
 	*	@brief	constructor;
 	*/
-	CodeEditor			( QWidget *parent = 0 );
+    CodeEditor (
+            QWidget *parent = 0 );
 
 
 	/**
 	*	@brief	destructor;
 	*/
-	~CodeEditor			( void );
+    ~CodeEditor();
 
 
-	void		lineNumberAreaPaintEvent		( QPaintEvent *event );
+    void
+    lineNumberAreaPaintEvent (
+            QPaintEvent *event );
 
-	int			lineNumberAreaWidth				( void );
+    int
+    lineNumberAreaWidth ();
+
+    bool
+    saveState (
+            QSettings & stg);
+
+    bool
+    restoreState (
+            QSettings & stg);
 
 protected:
 
@@ -207,8 +220,8 @@ public:
 		codeEditor = editor;
 	}
 
-	QSize				sizeHint		( void ) const
-	{
+    QSize
+    sizeHint() const {
 		return QSize(codeEditor->lineNumberAreaWidth(), 0);
 	}
 

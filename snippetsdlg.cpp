@@ -72,6 +72,9 @@ SnippetsDlg::SnippetsDlg(QWidget *parent) :
     ui->tv_content->header()->restoreState (
                 s.value(
                     STG_SNIPP_TV_STATE).toByteArray());
+    s.beginGroup (STG_SNIPP_CODE_STATE);
+      ui->tx_content->restoreState (s);
+    s.endGroup ();
 
     on_tv_content_currentItemChanged (NULL, NULL);
 
@@ -90,6 +93,9 @@ void SnippetsDlg::closeEvent(QCloseEvent *)
     QSettings s;
     s.setValue (STG_SNIPP_GEOMETRY, saveGeometry ());
     s.setValue (STG_SNIPP_TV_STATE, ui->tv_content->header()->saveState ());
+    s.beginGroup (STG_SNIPP_CODE_STATE);
+      ui->tx_content->saveState (s);
+    s.endGroup ();
 }
 
 void SnippetsDlg::on_database_browse_clicked()
