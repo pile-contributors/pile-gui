@@ -52,15 +52,26 @@ SnippetsDlg::SnippetsDlg(QWidget *parent) :
         s_path = d.absoluteFilePath ("snippets.xml");
         QFile file (s_path);
         if (!file.exists ()) {
-            QTextStream txs (&file);
+            if (file.open (QIODevice::WriteOnly)) {
+                QTextStream txs (&file);
 
-            txs << "<?xml version='1.0' encoding='UTF-8'?>\n"
-                << "<snippets>\n"
-                << "</snippets>\n";
-            file.close();
+                txs << "<?xml version='1.0' encoding='UTF-8'?>\n"
+                    << "<snippets>\n"
+                    << "</snippets>\n";
+                file.close();
+            }
         }
     }
     ui->database_path->setText (s_path);
+
+    QSettings s;
+
+    restoreGeometry (
+                s.value(
+                    STG_SNIPP_STATE).toByteArray());
+    ui->tv_content->header()->restoreState (
+                s.value(
+                    STG_SNIPP_TV_STATE).toByteArray());
 
     on_tv_content_currentItemChanged (NULL, NULL);
 
@@ -275,8 +286,8 @@ void SnippetsDlg::on_tv_content_currentItemChanged(
                 s_icon,
                 s_content);
     ui->le_name->setText (s_name),
-    ui->le_icon->setCurrentText (s_icon),
-    ui->tx_content->setPlainText (s_content);
+            ui->le_icon->setCurrentText (s_icon),
+            ui->tx_content->setPlainText (s_content);
 
     if (current == NULL) {
         ui->le_name->setEnabled (false);
@@ -302,6 +313,10 @@ void SnippetsDlg::on_tv_content_currentItemChanged(
 void SnippetsDlg::closeEvent(QCloseEvent *)
 {
     saveXMLFile (ui->database_path->text ());
+
+    QSettings s;
+    s.setValue (STG_SNIPP_GEOMETRY, saveGeometry ());
+    s.setValue (STG_SNIPP_TV_STATE, ui->tv_content->header()->saveState ());
 }
 
 void SnippetsDlg::on_b_icon_clicked()

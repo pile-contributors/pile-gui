@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Piles");
     QCoreApplication::setOrganizationDomain("piles.org");
     QCoreApplication::setApplicationName("PilesGui");
+    QCoreApplication::setApplicationVersion("1.0.0");
 
     Q_INIT_RESOURCE (appres);
 

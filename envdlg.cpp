@@ -90,16 +90,26 @@ EnvDlg::EnvDlg(QWidget *parent) :
         s_path = d.absoluteFilePath ("environment.xml");
         QFile file (s_path);
         if (!file.exists ()) {
-            QTextStream txs (&file);
+            if (file.open (QIODevice::WriteOnly)) {
+                QTextStream txs (&file);
 
-            txs << "<?xml version='1.0' encoding='UTF-8'?>\n"
-                << "<environment>\n"
-                << "</environment>\n";
-            file.close();
+                txs << "<?xml version='1.0' encoding='UTF-8'?>\n"
+                    << "<environment>\n"
+                    << "</environment>\n";
+                file.close();
+            }
         }
     }
     ui->database_path->setText (s_path);
 
+    QSettings s;
+
+    restoreGeometry (
+                s.value(
+                    STG_ENV_STATE).toByteArray());
+    ui->tv_content->header()->restoreState (
+                s.value(
+                    STG_ENV_TV_STATE).toByteArray());
 
     loadXMLFile (s_path);
 }
@@ -269,10 +279,12 @@ void EnvDlg::on_tv_content_currentItemChanged(
 
 void EnvDlg::closeEvent(QCloseEvent *)
 {
-    QTreeWidgetItem * tvi = ui->tv_content->currentItem ();
-    if (tvi != NULL)
-        on_tv_content_currentItemChanged (NULL, tvi);
+
     saveXMLFile (ui->database_path->text ());
+
+    QSettings s;
+    s.setValue (STG_ENV_GEOMETRY, saveGeometry ());
+    s.setValue (STG_ENV_TV_STATE, ui->tv_content->header()->saveState ());
 }
 
 void EnvDlg::on_actionCreate_new_variable_triggered()
