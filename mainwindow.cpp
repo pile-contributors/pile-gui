@@ -22,6 +22,7 @@
 #include <QInputDialog>
 #include <QToolButton>
 #include <QProcess>
+#include <QMimeData>
 
 
 #define NAVIGATE_BACK true
@@ -259,8 +260,8 @@ void MainWindow::loadSettings ()
                     STG_TV_STATE).toByteArray());
 
     QDir::Filters filfiltt = (QDir::Filters) (MANDATORY_QDIR_FILTER | s.value(
-        STG_TV_FILTER, (int)model->filter ()).toInt ());
-     model->setFilter (filfiltt);
+                                                  STG_TV_FILTER, (int)model->filter ()).toInt ());
+    model->setFilter (filfiltt);
 
     ui->actionFiles->setChecked ((filfiltt & QDir::Files) != 0);
     ui->actionDrives->setChecked ((filfiltt & QDir::Drives) != 0);
@@ -603,6 +604,7 @@ void MainWindow::on_treeView_customContextMenuRequested(
     mnu.addSeparator ();
     mnu.addAction (ui->actionGo_to_clipboard_path);
     mnu.addAction (ui->actionGo_to_path);
+    mnu.addAction (ui->actionCopy_path_to_clipboard);
 
     QMenu favs (tr("Favorites"));
     QStringList fav_list = favouritePaths ();
@@ -696,19 +698,119 @@ void MainWindow::on_btn_settings_clicked()
     }
 }
 
-void MainWindow::on_actionCopy_triggered()
+bool MainWindow::on_actionCopy_triggered()
 {
+    // get a list of files
+    QList<QUrl> urls;
+    foreach(const QModelIndex & mi, ui->treeView->selectionModel ()->selectedIndexes ()) {
+        if (mi.column () == 0) {
+            urls << QUrl::fromLocalFile (model->filePath (mi));
+        }
+    }
 
+    if (urls.count () == 0) {
+        PilesGui::showError (tr("Nothing selected"));
+        return false;
+    }
+
+    QMimeData* mm_data = new QMimeData();
+    mm_data->setUrls (urls);
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setMimeData (mm_data);
+
+    return true;
 }
 
 void MainWindow::on_actionCut_triggered()
 {
+    if (on_actionCopy_triggered()) {
 
+    }
+}
+
+//https://qt.gitorious.org/qt-creator/qt-creator/source/1a37da73abb60ad06b7e33983ca51b266be5910e:src/app/main.cpp#L13-189
+// taken from utils/fileutils.cpp.
+static bool copyRecursively(const QString &srcFilePath,
+                            const QString &tgtFilePath)
+{
+    QFileInfo srcFileInfo(srcFilePath);
+    if (srcFileInfo.isDir()) {
+        QDir targetDir(tgtFilePath);
+        targetDir.cdUp();
+        if (!targetDir.mkdir(QFileInfo(tgtFilePath).fileName()))
+            return false;
+        QDir sourceDir(srcFilePath);
+        QStringList fileNames = sourceDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
+        foreach (const QString &fileName, fileNames) {
+            const QString newSrcFilePath
+                    = srcFilePath + QLatin1Char('/') + fileName;
+            const QString newTgtFilePath
+                    = tgtFilePath + QLatin1Char('/') + fileName;
+            if (!copyRecursively(newSrcFilePath, newTgtFilePath))
+                return false;
+        }
+    } else {
+        if (!QFile::copy(srcFilePath, tgtFilePath))
+            return false;
+    }
+    return true;
 }
 
 void MainWindow::on_actionPaste_triggered()
 {
 
+    QString s_path = currentDirectory ();
+    if (s_path.isEmpty ()) {
+        PilesGui::showError (
+                    tr("No destination path selected"));
+    } else {
+        QClipboard *clipboard = QApplication::clipboard();
+        const QMimeData* data = clipboard->mimeData ();
+
+        if (!data->formats().contains ("text/uri-list")) {
+            PilesGui::showError (
+                        tr("No files in the clipboard"));
+        } else {
+            QList<QUrl> urls = data->urls ();
+            if (urls.isEmpty ()) {
+                PilesGui::showError (
+                            tr("No files in the clipboard"));
+            } else {
+                int i_non_file = 0;
+                foreach(const QUrl & u, urls) {
+                    if (u.isLocalFile ()) {
+                        QString s_path_source = u.toLocalFile ();
+                        QFileInfo srcFileInfo (s_path_source);
+                        QString s_path_target = QString("%1%2%3")
+                                .arg(s_path)
+                                .arg(QDir::separator ())
+                                .arg(srcFileInfo.fileName ());
+
+                        if (!copyRecursively (s_path_source, s_path_target)) {
+                            PilesGui::showError (
+                                        tr("Could not copy %1\nto %2")
+                                        .arg(s_path_source).arg(s_path_target));
+                            break;
+                        }
+                    } else {
+                        ++i_non_file;
+                    }
+                }
+                if (i_non_file > 0) {
+                    if (i_non_file < urls.count ()) {
+                        PilesGui::showError (
+                                    tr("A number of %1 entries in the\n"
+                                       "clipboard were not identified\n"
+                                       "as local paths and could not be copied")
+                                    .arg(i_non_file));
+                    } else {
+                        PilesGui::showError (
+                                    tr("The clipboard does not contain local files"));
+                    }
+                }
+            }
+        }
+    }
 }
 
 void MainWindow::on_actionAdd_custom_command_triggered()
@@ -761,78 +863,90 @@ void MainWindow::on_actionFiles_triggered(bool checked)
 {
     model->setFilter (
                 checked ?
-                model->filter () | QDir::Files :
-                model->filter () & (~QDir::Files));
+                    model->filter () | QDir::Files :
+                    model->filter () & (~QDir::Files));
 }
 
 void MainWindow::on_actionDrives_triggered(bool checked)
 {
     model->setFilter (
                 checked ?
-                model->filter () | QDir::Drives :
-                model->filter () & (~QDir::Drives));
+                    model->filter () | QDir::Drives :
+                    model->filter () & (~QDir::Drives));
 }
 
 void MainWindow::on_actionSymbolic_links_triggered(bool checked)
 {
     model->setFilter (
                 !checked ?
-                model->filter () | QDir::NoSymLinks :
-                model->filter () & (~QDir::NoSymLinks));
+                    model->filter () | QDir::NoSymLinks :
+                    model->filter () & (~QDir::NoSymLinks));
 }
 
 void MainWindow::on_actionReadable_triggered(bool checked)
 {
     model->setFilter (
                 checked ?
-                model->filter () | QDir::Readable :
-                model->filter () & (~QDir::Readable));
+                    model->filter () | QDir::Readable :
+                    model->filter () & (~QDir::Readable));
 }
 
 void MainWindow::on_actionWritable_triggered(bool checked)
 {
     model->setFilter (
                 checked ?
-                model->filter () | QDir::Writable :
-                model->filter () & (~QDir::Writable));
+                    model->filter () | QDir::Writable :
+                    model->filter () & (~QDir::Writable));
 }
 
 void MainWindow::on_actionExecutable_triggered(bool checked)
 {
     model->setFilter (
                 checked ?
-                model->filter () | QDir::Executable :
-                model->filter () & (~QDir::Executable));
+                    model->filter () | QDir::Executable :
+                    model->filter () & (~QDir::Executable));
 }
 
 void MainWindow::on_actionModified_triggered(bool checked)
 {
     model->setFilter (
                 checked ?
-                model->filter () | QDir::Modified :
-                model->filter () & (~QDir::Modified));
+                    model->filter () | QDir::Modified :
+                    model->filter () & (~QDir::Modified));
 }
 
 void MainWindow::on_actionHidden_triggered(bool checked)
 {
     model->setFilter (
                 checked ?
-                model->filter () | QDir::Hidden :
-                model->filter () & (~QDir::Hidden));
+                    model->filter () | QDir::Hidden :
+                    model->filter () & (~QDir::Hidden));
 }
 
 void MainWindow::on_actionSystem_triggered(bool checked)
 {
     model->setFilter (
                 checked ?
-                model->filter () | QDir::System :
-                model->filter () & (~QDir::System));
+                    model->filter () | QDir::System :
+                    model->filter () & (~QDir::System));
 }
 
 void MainWindow::on_actionCase_sensitive_triggered(bool checked)
 {
     model->setFilter (
                 checked ?
-                model->filter () | QDir::CaseSensitive :
-                model->filter () & (~QDir::CaseSensitive));
+                    model->filter () | QDir::CaseSensitive :
+                    model->filter () & (~QDir::CaseSensitive));
+}
+
+void MainWindow::on_actionCopy_path_to_clipboard_triggered()
+{
+    QString s_path = currentPath ();
+    if (s_path.isEmpty ()) {
+        PilesGui::showError (tr("Nothing selected"));
+    } else {
+        s_path = QDir::toNativeSeparators (s_path);
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setText (s_path);
+    }
 }

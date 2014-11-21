@@ -398,73 +398,73 @@ alternate-background-color: rgb(246, 255, 249);</string>
    </property>
   </action>
   <action name="actionFiles">
-  <property name="checkable">
-   <bool>true</bool>
-  </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Files</string>
    </property>
   </action>
   <action name="actionDrives">
-  <property name="checkable">
-   <bool>true</bool>
-  </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Drives</string>
    </property>
   </action>
   <action name="actionSymbolic_links">
-  <property name="checkable">
-   <bool>true</bool>
-  </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Symbolic links</string>
    </property>
   </action>
   <action name="actionReadable">
-  <property name="checkable">
-   <bool>true</bool>
-  </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Readable</string>
    </property>
   </action>
   <action name="actionWritable">
-  <property name="checkable">
-   <bool>true</bool>
-  </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Writable</string>
    </property>
   </action>
   <action name="actionExecutable">
-  <property name="checkable">
-   <bool>true</bool>
-  </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Executable</string>
    </property>
   </action>
   <action name="actionModified">
-  <property name="checkable">
-   <bool>true</bool>
-  </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Modified</string>
    </property>
   </action>
   <action name="actionHidden">
-  <property name="checkable">
-   <bool>true</bool>
-  </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Hidden</string>
    </property>
   </action>
   <action name="actionSystem">
-  <property name="checkable">
-   <bool>true</bool>
-  </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>System</string>
    </property>
@@ -475,6 +475,15 @@ alternate-background-color: rgb(246, 255, 249);</string>
    </property>
    <property name="text">
     <string>Case sensitive</string>
+   </property>
+  </action>
+  <action name="actionCopy_path_to_clipboard">
+   <property name="icon">
+    <iconset resource="appres.qrc">
+     <normaloff>:/icons/resources/icons/page_copy.png</normaloff>:/icons/resources/icons/page_copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy path to clipboard</string>
    </property>
   </action>
  </widget>

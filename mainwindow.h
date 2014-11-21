@@ -72,7 +72,7 @@ private slots:
 
     void navigationAction();
 
-    void on_actionCopy_triggered();
+    bool on_actionCopy_triggered();
 
     void on_actionCut_triggered();
 
@@ -107,6 +107,8 @@ private slots:
 
     void on_actionCase_sensitive_triggered(bool checked);
 
+    void on_actionCopy_path_to_clipboard_triggered();
+    
 private:
     Ui::MainWindow *ui;
     QFileSystemModel *model;
