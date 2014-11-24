@@ -724,7 +724,7 @@ bool MainWindow::on_actionCopy_triggered()
 void MainWindow::on_actionCut_triggered()
 {
     if (on_actionCopy_triggered()) {
-
+        // TODO
     }
 }
 
