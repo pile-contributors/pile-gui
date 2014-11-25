@@ -57,7 +57,14 @@ ProgramRunner *ProgramRunner::startProgram(
     }
 
     QProcessEnvironment env =
+#if 1
+            // seems to create bugs with git command
             PilesGui::processEnvironment ();
+#else
+            QProcessEnvironment::systemEnvironment ();
+#endif
+
+#if 0
     env.clear ();
     env.insert("TRICKY1", "PileGui");
     env.insert("TRICKY2", "PileGui");
@@ -67,6 +74,7 @@ ProgramRunner *ProgramRunner::startProgram(
     env.insert("TRICKY6", "PileGui");
     env.insert("TRICKY7", "PileGui");
     env.insert("TRICKY8", "PileGui");
+#endif
     pr->my_process.setProcessEnvironment (env);
 
     // pr->my_process.closeWriteChannel();

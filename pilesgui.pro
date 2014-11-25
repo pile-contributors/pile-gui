@@ -50,7 +50,8 @@ SOURCES += main.cpp\
     snippets/snipmodel.cpp \
     snippets/snipitem.cpp \
     envdlg.cpp \
-    editors/codeeditor.cc
+    editors/codeeditor.cc \
+    support/fsmodelenhanced.cpp
 
 HEADERS  += mainwindow.h \
     setting_names.h \
@@ -74,7 +75,8 @@ HEADERS  += mainwindow.h \
     snippets/snipmodel.h \
     snippets/snipitem.h \
     envdlg.h \
-    editors/codeeditor.h
+    editors/codeeditor.h \
+    support/fsmodelenhanced.h
 
 FORMS    += mainwindow.ui \
     pileslist.ui \

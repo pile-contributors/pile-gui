@@ -266,7 +266,7 @@ bool GitWrapper::doAjob (
             break;
         }
 
-        b_ret = true;
+        b_ret = b_ready;
         break;
     }
     //    if (prog_run != NULL) {

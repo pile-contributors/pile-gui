@@ -33,7 +33,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    model(new QFileSystemModel),
+    model(new FsModelEnhanced),
     my_comp_index(),
     forward_menu(new QMenu(this)),
     backward_menu(new QMenu(this)),
@@ -61,6 +61,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->treeView->setSortingEnabled (true);
     my_comp_index = ui->treeView->rootIndex ();
 
+#if 0
+    connect (model, SIGNAL(fsmeLoadStart()),
+             this, SLOT(fsmeLoadStart()));
+    connect (model, SIGNAL(fsmeLoadEnd()),
+             this, SLOT(fsmeLoadEnd()));
+#endif
+
     connect (ui->treeView->selectionModel(),
              SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
              this,
@@ -73,6 +80,17 @@ MainWindow::MainWindow(QWidget *parent) :
     loadSettings();
 
 }
+
+void MainWindow::fsmeLoadStart()
+{
+    ui->treeView->setCursor (Qt::WaitCursor);
+}
+
+void MainWindow::fsmeLoadEnd()
+{
+    ui->treeView->setCursor (Qt::ArrowCursor);
+}
+
 
 void MainWindow::afterShown()
 {
@@ -198,7 +216,7 @@ void MainWindow::navigationTrim (
 
 void MainWindow::showStatusMessage (const QString & s_path)
 {
-    ui->statusBar->showMessage (s_path, SEC_TO_MSEC(12));
+    ui->statusBar->showMessage (s_path, SEC_TO_MSEC(40));
 }
 
 void MainWindow::navigationUser (const QString & s_path)
@@ -849,8 +867,9 @@ void MainWindow::on_actionCopy_and_replace_triggered()
 
 void MainWindow::on_actionSnippets_triggered()
 {
-    SnippetsDlg dlg;
-    dlg.exec ();
+    SnippetsDlg * dlg = new SnippetsDlg (this);
+    dlg->show ();
+    dlg->setAttribute (Qt::WA_DeleteOnClose);
 }
 
 void MainWindow::on_actionEnvironment_Variables_triggered()

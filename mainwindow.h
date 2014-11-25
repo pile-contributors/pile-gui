@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QFileSystemModel>
+#include "support/fsmodelenhanced.h"
 
 namespace Ui {
 class MainWindow;
@@ -109,9 +109,13 @@ private slots:
 
     void on_actionCopy_path_to_clipboard_triggered();
     
+    void fsmeLoadStart();
+
+    void fsmeLoadEnd();
+
 private:
     Ui::MainWindow *ui;
-    QFileSystemModel *model;
+    FsModelEnhanced *model;
     QModelIndex my_comp_index;
     QMenu * forward_menu;
     QMenu * backward_menu;

@@ -163,13 +163,13 @@ QTreeWidgetItem * NewPileDlg::createItem (
                 Qt::ItemIsEnabled);
 
     if (b_file) {
-        QIcon icn (":/icons/resources/icons/folder.png");
+        QIcon icn (":/icons/resources/icons/text.png");
         DBG_ASSERT (!icn.isNull ());
         crt_item->setIcon (0, icn);
         crt_item->setIcon (1, icn);
         crt_item->setIcon (2, icn);
     } else {
-        QIcon icn (":/icons/resources/icons/text.png");
+        QIcon icn (":/icons/resources/icons/folder.png");
         DBG_ASSERT (!icn.isNull ());
         crt_item->setIcon (0, icn);
     }
