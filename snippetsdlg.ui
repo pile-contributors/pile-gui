@@ -199,6 +199,15 @@
    <header>editors/codeeditor.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>database_path</tabstop>
+  <tabstop>database_browse</tabstop>
+  <tabstop>tv_content</tabstop>
+  <tabstop>le_name</tabstop>
+  <tabstop>le_icon</tabstop>
+  <tabstop>b_icon</tabstop>
+  <tabstop>tx_content</tabstop>
+ </tabstops>
  <resources>
   <include location="appres.qrc"/>
  </resources>

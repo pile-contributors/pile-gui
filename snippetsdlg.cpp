@@ -235,6 +235,8 @@ void SnippetsDlg::on_actionAdd_new_group_triggered()
         }
 
         model_->addRootGroup (tr("New group"));
+        ui->le_name->setFocus ();
+        ui->le_name->selectAll ();
         break;
     }
 
@@ -251,6 +253,8 @@ void SnippetsDlg::on_actionAdd_new_snipped_triggered()
         SnipGroup * msel = model_->currentGroup();
         if (msel != NULL) {
             model_->addSnip (tr("New snippet"), msel);
+            ui->le_name->setFocus ();
+            ui->le_name->selectAll ();
         } else {
             PilesGui::showError (tr ("Please select the location, first"));
         }
