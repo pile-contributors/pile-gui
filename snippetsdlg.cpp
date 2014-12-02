@@ -345,3 +345,10 @@ void SnippetsDlg::on_b_icon_clicked()
         }
     }
 }
+
+void SnippetsDlg::on_le_name_returnPressed()
+{
+    QTreeWidgetItem * tvi = ui->tv_content->currentItem ();
+    if (tvi != NULL)
+        on_tv_content_currentItemChanged (tvi, tvi);
+}

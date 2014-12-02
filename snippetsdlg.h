@@ -44,6 +44,8 @@ private slots:
 
     void on_b_icon_clicked();
 
+    void on_le_name_returnPressed();
+
 protected:
 
     void
