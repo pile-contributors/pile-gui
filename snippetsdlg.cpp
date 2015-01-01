@@ -231,6 +231,8 @@ void SnippetsDlg::on_actionAdd_new_group_triggered()
         SnipGroup * msel = model_->currentGroup();
         if (msel != NULL) {
             model_->addGroup (tr("New group"), msel);
+            ui->le_name->setFocus ();
+            ui->le_name->selectAll ();
             break;
         }
 

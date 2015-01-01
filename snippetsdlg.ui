@@ -169,7 +169,7 @@
      <normaloff>:/icons/resources/icons/star.png</normaloff>:/icons/resources/icons/star.png</iconset>
    </property>
    <property name="text">
-    <string>Add new snipped</string>
+    <string>Add new snippet</string>
    </property>
   </action>
   <action name="actionRemove">
