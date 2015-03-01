@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QDesktopServices>
+#include <QProcessEnvironment>
 #include <QUrl>
 
 ProgramRunner::ProgramRunner(QObject *parent) :
@@ -29,7 +30,8 @@ void ProgramRunner::terminate()
 
 ProgramRunner *ProgramRunner::startProgram(
         const QString & program, const QStringList & arguments,
-        const QString & working_dir, kbFinal kb, void * kb_data)
+        const QString & working_dir, kbFinal kb, void * kb_data,
+        const QMap<QString,QString> & env_vars )
 {
     ProgramRunner * pr = new ProgramRunner();
     pr->kb = kb;
@@ -52,12 +54,24 @@ ProgramRunner *ProgramRunner::startProgram(
     pr->my_process.setProgram (program);
     pr->my_process.setArguments (arguments);
 
+    // adjust environment
+    if (env_vars.isEmpty ()) {
+        QProcessEnvironment penv = pr->my_process.processEnvironment ();
+        if (penv.isEmpty ()) {
+            penv = QProcessEnvironment::systemEnvironment ();
+        }
+        foreach(const QString & k, env_vars) {
+            penv->insert (k, env_vars.value (k));
+        }
+        pr->my_process.setProcessEnvironment (penv);
+    }
+
     if (!working_dir.isEmpty ()) {
         pr->my_process.setWorkingDirectory (working_dir);
     }
 
     QProcessEnvironment env =
-#if 1
+        #if 1
             // seems to create bugs with git command
             PilesGui::processEnvironment ();
 #else
@@ -161,20 +175,20 @@ void ProgramRunner::startProgramOrOpenFile (const QString &program)
 {
 #ifdef WIN32
     if (program.endsWith (".bat") || program.endsWith (".cmd")) {
-//        QProcess * p = new QProcess();
-//        p->setProgram ("cmd.exe");
+        //        QProcess * p = new QProcess();
+        //        p->setProgram ("cmd.exe");
 
         QStringList sl;
         sl << "/C" << program;
 
         QProcess::startDetached ("cmd.exe", sl);
 
-//        p->setArguments (sl);
-//        p->setProcessEnvironment (PilesGui::processEnvironment ());
-//        p->closeWriteChannel ();
-//        QObject::connect(p, SIGNAL(finished(int)),
-//                         p, SLOT(deleteLater()));
-//        p->start();
+        //        p->setArguments (sl);
+        //        p->setProcessEnvironment (PilesGui::processEnvironment ());
+        //        p->closeWriteChannel ();
+        //        QObject::connect(p, SIGNAL(finished(int)),
+        //                         p, SLOT(deleteLater()));
+        //        p->start();
         return;
     }
 #endif

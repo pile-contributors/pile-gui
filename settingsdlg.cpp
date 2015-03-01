@@ -1,6 +1,9 @@
+#include "config.h"
+
 #include "settingsdlg.h"
 #include "ui_settingsdlg.h"
 #include "setting_names.h"
+#include "support/simplecrypt.h"
 
 #include <QSettings>
 #include <QFileDialog>
@@ -15,6 +18,7 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
 
     ui->le_cmake_exe->setText (getCMakeExe());
     ui->le_git_exe->setText (getGitExe());
+    ui->le_hub_exe->setText (getHubExe());
 
     QSettings stg;
 
@@ -24,6 +28,11 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
                 stg.value (STG_OUTPUT_PATH).toString ());
     ui->le_backup_path->setText (
                 stg.value (STG_BACKUP_PATH).toString ());
+
+    ui->le_github_un->setText (
+                stg.value (STG_GITHUB_USER).toString ());
+    ui->le_github_pass->setText (
+                decrypt (stg.value (STG_GITHUB_PASS).toString ()));
 
 }
 
@@ -103,6 +112,55 @@ QString SettingsDlg::getGitExe()
     return s_value;
 }
 
+QString SettingsDlg::getHubExe()
+{
+    QSettings stg;
+    QString s_value;
+    for (;;) {
+        // from settings
+        s_value = stg.value (STG_APPS_HUB).toString ();
+        if (!s_value.isEmpty ()) break;
+
+        // from PATH
+        s_value = QStandardPaths::findExecutable ("hub");
+        if (!s_value.isEmpty ()) break;
+
+        // be smart
+        QString s = QDir::homePath ();
+        if (s.at (1) == ':') {
+
+            // we're on windows
+            QDir d (QString("%1:\\").arg(s.at (1)));
+
+            if (d.exists("Program Files\\Hub\\hub.exe")) {
+                s_value = d.absoluteFilePath (
+                            "Program Files\\Hub\\hub.exe");
+                break;
+            }
+
+            if (d.exists("Program Files (x86)\\Hub\\hub.exe")) {
+                s_value = d.absoluteFilePath (
+                            "Program Files (x86)\\Hub\\hub.exe");
+                break;
+            }
+        }
+
+        break;
+    }
+    return s_value;
+}
+
+QString SettingsDlg::encrypt (const QString &value)
+{
+    SimpleCrypt crypto (SIMPLE_CRYPT_KEY);
+    return crypto.encryptToString (value);
+}
+
+QString SettingsDlg::decrypt (const QString &value)
+{
+    SimpleCrypt crypto (SIMPLE_CRYPT_KEY);
+    return crypto.decryptToString (value);
+}
 
 SettingsDlg::~SettingsDlg()
 {
@@ -114,9 +172,12 @@ void SettingsDlg::saveContent()
     QSettings stg;
     stg.setValue (STG_APPS_CMAKE, ui->le_cmake_exe->text ());
     stg.setValue (STG_APPS_GIT, ui->le_git_exe->text ());
+    stg.setValue (STG_APPS_HUB, ui->le_hub_exe->text ());
     stg.setValue (STG_TEMPLATE_PATH, ui->le_template_path->text ());
     stg.setValue (STG_OUTPUT_PATH, ui->le_output_path->text ());
     stg.setValue (STG_BACKUP_PATH, ui->le_backup_path->text ());
+    stg.setValue (STG_GITHUB_USER, ui->le_github_un->text ());
+    stg.setValue (STG_GITHUB_PASS, encrypt (ui->le_github_pass->text ()));
 }
 
 void SettingsDlg::on_btn_cmake_exe_clicked()
@@ -187,6 +248,21 @@ void SettingsDlg::on_btn_backup_path_clicked()
                     ui->le_backup_path->text ());
         if (fileName.isEmpty ()) break;
         ui->le_backup_path->setText (fileName);
+        break;
+    }
+}
+
+void SettingsDlg::on_btn_hub_exe_clicked()
+{
+    for (;;) {
+        QString fileName =
+                QFileDialog::getOpenFileName(
+                    this,
+                    tr("Select the hub executable"),
+                    ui->le_hub_exe->text (),
+                    tr("All Files (*.*)"));
+        if (fileName.isEmpty ()) break;
+        ui->le_hub_exe->setText (fileName);
         break;
     }
 }

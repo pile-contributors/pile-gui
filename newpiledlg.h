@@ -18,7 +18,9 @@ public:
     ~NewPileDlg();
 
     bool doCreatePile();
+
 private slots:
+
     void on_btn_template_path_clicked();
 
     void on_btn_output_path_clicked();

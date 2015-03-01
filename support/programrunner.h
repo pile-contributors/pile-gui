@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QString>
+#include <QMap>
 
 class QProcess;
 
@@ -70,7 +72,8 @@ public:
             const QStringList & arguments,
             const QString & working_dir,
             kbFinal kb,
-            void * kb_data = NULL);
+            void * kb_data = NULL,
+            const QMap<QString,QString> & env_vars = QMap<QString,QString>());
 
     static const char *
     errorName(

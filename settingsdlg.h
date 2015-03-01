@@ -31,10 +31,22 @@ private slots:
 
     void on_btn_backup_path_clicked();
 
+    void on_btn_hub_exe_clicked();
+
 private:
     Ui::SettingsDlg *ui;
     QString getCMakeExe();
     QString getGitExe();
+    QString getHubExe();
+
+    static QString
+    encrypt (
+            const QString & value);
+
+    static QString
+    decrypt (
+            const QString & value);
+
 };
 
 #endif // SETTINGSDLG_H

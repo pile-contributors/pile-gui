@@ -189,5 +189,6 @@ static inline void black_hole (...)
 
 #define SEC_TO_MSEC(__val__) (__val__*1000)
 
+#define SIMPLE_CRYPT_KEY Q_UINT64_C(0x0c4dac5683f56123)
 
 #endif // CONFIG_H

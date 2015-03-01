@@ -51,7 +51,8 @@ SOURCES += main.cpp\
     snippets/snipitem.cpp \
     envdlg.cpp \
     editors/codeeditor.cc \
-    support/fsmodelenhanced.cpp
+    support/fsmodelenhanced.cpp \
+    support/simplecrypt.cc
 
 HEADERS  += mainwindow.h \
     setting_names.h \
@@ -76,7 +77,8 @@ HEADERS  += mainwindow.h \
     snippets/snipitem.h \
     envdlg.h \
     editors/codeeditor.h \
-    support/fsmodelenhanced.h
+    support/fsmodelenhanced.h \
+    support/simplecrypt.h
 
 FORMS    += mainwindow.ui \
     pileslist.ui \

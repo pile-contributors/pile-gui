@@ -1,4 +1,7 @@
 #include "../config.h"
+
+#include "../support/simplecrypt.h"
+
 #include "../pilesgui.h"
 #include "../setting_names.h"
 
@@ -8,7 +11,10 @@
 
 #include <QSettings>
 #include <QDebug>
+#include <QFileInfo>
 
+const QString s_github_org = "pile-contributors";
+const QString s_url_org    = "http://pile-contributors.github.io/";
 
 GitWrapper::GitWrapper() :
     process_exit_code_(-999),
@@ -16,7 +22,8 @@ GitWrapper::GitWrapper() :
     s_error_(),
     s_combined_(),
     b_ready(false),
-    s_error_message_()
+    s_error_message_(),
+    hub_mode_(false)
 {
     qDebug() << "Creating GitWrapper " << (unsigned long long)this << "\n";
 }
@@ -35,6 +42,26 @@ QString GitWrapper::getGit()
                     QObject::tr("Git executable not set"));
     }
     return s_git;
+}
+
+QString GitWrapper::getHub()
+{
+    QSettings stg;
+    QString s_git = stg.value (STG_APPS_HUB).toString ();
+    if (s_git.isEmpty ()) {
+        PilesGui::showError (
+                    QObject::tr("Hub executable not set"));
+    }
+    return s_git;
+}
+
+bool GitWrapper::hasHub()
+{
+    QSettings stg;
+    QString s_git = stg.value (STG_APPS_HUB).toString ();
+    if (s_git.isEmpty ()) return false;
+    QFileInfo fi (s_git);
+    return (fi.exists () && fi.isExecutable ());
 }
 
 QString GitWrapper::getGitBackup()
@@ -62,6 +89,53 @@ bool GitWrapper::addAll(
         b_ret = wrap_git.doAjob (s_path, args);
         break;
     }
+    return b_ret;
+}
+
+const QString & GitWrapper::gitHubOrg ()
+{
+    return s_github_org;
+}
+
+const QString & GitWrapper::urlOrg ()
+{
+    return s_github_org;
+}
+
+bool GitWrapper::createGitHubRepo (
+        const QString & s_path,
+        const QString &s_name, const QString &s_org,
+        const QString &s_description, const QString &s_info_url)
+{
+    bool b_ret = false;
+    for (;;) {
+
+        GitWrapper wrap_git;
+        wrap_git.hub_mode_ = true;
+        wrap_git.s_error_message_ = QObject::tr(
+                    "Failed to create Github repository\n");
+        QStringList args;
+        args << "create";
+
+        if (s_org.isEmpty ()) {
+            args << s_name;
+        } else {
+            args << QString("%1/%2").arg (s_org).arg(s_name);
+        }
+
+        if (!s_description.isEmpty ()) {
+            args << "-d" << s_description;
+        }
+
+        if (!s_info_url.isEmpty ()) {
+            args << "-h" << s_info_url;
+        }
+
+        b_ret = wrap_git.doAjob (s_path, args);
+        b_ret = true;
+        break;
+    }
+
     return b_ret;
 }
 
@@ -93,7 +167,8 @@ bool GitWrapper::commit(
 }
 
 bool GitWrapper::push (
-        const QString & s_path, const QString & s_remote)
+        const QString & s_path, const QString & s_remote,
+        const QString & s_branch)
 {
     bool b_ret = false;
     for (;;) {
@@ -108,6 +183,7 @@ bool GitWrapper::push (
             args << "--all";
         } else {
             args << s_remote;
+            args << s_branch;
         }
 
         b_ret = wrap_git.doAjob (s_path, args);
@@ -244,7 +320,21 @@ bool GitWrapper::doAjob (
     ProgramRunner * prog_run;
     for (;;) {
 
-        QString s_git = getGit();
+        QString s_git;
+        QMap<QString,QString> env;
+
+        if (hub_mode_) {
+            QSettings stg;
+            SimpleCrypt crypto (SIMPLE_CRYPT_KEY);
+            QString s_pass = crypto.decryptToString (
+                        stg.value (STG_GITHUB_PASS).toString ());
+            s_git  = getHub ();
+            env.insert ("GITHUB_USER", stg.value (STG_GITHUB_USER).toString ());
+            env.insert ("GITHUB_PASSWORD", s_pass);
+        } else {
+            s_git  = getGit ();
+        }
+
         if (s_git.isEmpty ()) break;
 
         prog_run = ProgramRunner::startProgram(

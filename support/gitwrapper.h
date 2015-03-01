@@ -13,6 +13,8 @@ class GitWrapper
     bool b_ready;
     QString s_error_message_;
 
+    bool hub_mode_;
+
     GitWrapper();
     virtual ~GitWrapper();
 
@@ -21,6 +23,14 @@ public:
     //! shows an error message if empty
     static QString
     getGit();
+
+    //! shows an error message if empty
+    static QString
+    getHub ();
+
+    //! Tell if hub was found
+    static bool
+    hasHub ();
 
     //! location of backups
     static QString
@@ -37,7 +47,8 @@ public:
     static bool
     push (
             const QString & s_path,
-            const QString & s_remote = QString());
+            const QString & s_remote = QString(),
+            const QString & s_branch = "master");
 
     static bool
     init(
@@ -66,6 +77,20 @@ public:
     static bool
     addAll(
             const QString &s_path);
+
+    static const QString &
+    gitHubOrg ();
+
+    static const QString &
+    urlOrg ();
+
+    static bool
+    createGitHubRepo (
+            const QString & s_path,
+            const QString & s_name,
+            const QString & s_org = QString(),
+            const QString & s_description = QString(),
+            const QString & s_info_url = QString());
 
 private:
 

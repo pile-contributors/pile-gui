@@ -37,6 +37,10 @@ bool Pile::createAllNew(
     bool b_ret_tmp = false;
     bool b_stage_1 = true;
     for (;;){
+        bool b_has_hub = GitWrapper::hasHub ();
+        QString permanent_repo_pile;
+        QString permanent_repo_helper;
+
 #if 0
         QString s_tmpl ("TemPile");
         QStringList sl_keys;
@@ -215,6 +219,53 @@ bool Pile::createAllNew(
                     QObject::tr("Initial commit"),
                     true)) break;
 
+        // if we have hub (https://hub.github.com/) we can also create remote repos
+        if (b_has_hub) {
+            permanent_repo_pile =
+                    QString("git@github.com:%1/%2.git")
+                    .arg (GitWrapper::gitHubOrg ())
+                    .arg (pile_name_l);
+            permanent_repo_helper =
+                    QString("git@github.com:%1/%2-helpers.git")
+                    .arg (GitWrapper::gitHubOrg ())
+                    .arg (pile_name_l;
+
+            if (!GitWrapper::createGitHubRepo (
+                        s_full_path_pile,
+                        pile_name_l,
+                        GitWrapper::gitHubOrg (),
+                        pile_name,
+                        GitWrapper::urlOrg ())) break;
+            if (!GitWrapper::createGitHubRepo (
+                        s_full_path_helpers,
+                        QString("%1-helpers").arg(pile_name_l),
+                        GitWrapper::gitHubOrg (),
+                        QObject::tr("Helper code for %1 pile").arg (pile_name),
+                        GitWrapper::urlOrg ())) break;
+
+            if (!GitWrapper::setUpstream (
+                        s_full_path_helpers,
+                        "origin",
+                        "master"))
+                break;
+            if (!GitWrapper::setUpstream (
+                        s_full_path_pile,
+                        "origin",
+                        "master"))
+                break;
+
+            if (!GitWrapper::push (
+                        s_full_path_pile,
+                        "origin"))
+                break;
+            if (!GitWrapper::push (
+                        s_full_path_helpers,
+                        "origin"))
+                break;
+
+
+        }
+
         // if we have a backup path create backups
         if (!s_backup_path.isEmpty ()) {
             reportStat (kb_sts, QObject::tr("Backup directories ..."));
@@ -252,32 +303,48 @@ bool Pile::createAllNew(
                         s_backup_pile_full))
                 break;
 
-            reportStat (kb_sts, QObject::tr("Setting upstream ..."));
-            if (!GitWrapper::setUpstream (
-                        s_full_path_helpers,
-                        "backup",
-                        "master"))
-                break;
-            if (!GitWrapper::setUpstream (
-                        s_full_path_pile,
-                        "backup",
-                        "master"))
-                break;
+            if (!b_has_hub) {
+                reportStat (kb_sts, QObject::tr("Setting upstream ..."));
+                if (!GitWrapper::setUpstream (
+                            s_full_path_helpers,
+                            "backup",
+                            "master"))
+                    break;
+                if (!GitWrapper::setUpstream (
+                            s_full_path_pile,
+                            "backup",
+                            "master"))
+                    break;
+                permanent_repo_pile = s_backup_pile_full;
+                permanent_repo_helper = s_backup_helpers_full;
 
+            }
+        }
+
+        if (b_has_hub || (!s_backup_path.isEmpty ())) {
             reportStat (kb_sts, QObject::tr("Adding submodules ..."));
             if (!GitWrapper::addSubmodule (
                         s_full_path_helpers,
-                        s_backup_pile_full,
+                        permanent_repo_pile,
                         pile_name_l,
                         QObject::tr("Imported upstream source code")))
                 break;
+        }
 
-            reportStat (kb_sts, QObject::tr("Publishing changes ..."));
+        reportStat (kb_sts, QObject::tr("Publishing changes ..."));
+        if (b_has_hub) {
+            if (!GitWrapper::push (
+                        s_full_path_helpers,
+                        "origin"))
+                break;
+        }
+        if (!s_backup_path.isEmpty ()) {
             if (!GitWrapper::push (
                         s_full_path_helpers,
                         "backup"))
                 break;
         }
+
 
 /*
         echo "Adding files in pile source to git..."
