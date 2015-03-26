@@ -27,9 +27,11 @@ NewPileDlg::NewPileDlg(QWidget *parent) :
     QSettings stg;
 
     ui->le_template_path->setText (
-                stg.value (STG_TEMPLATE_PATH).toString ());
+                QDir::toNativeSeparators (
+                stg.value (STG_TEMPLATE_PATH).toString ()));
     ui->le_output_path->setText (
-                stg.value (STG_OUTPUT_PATH).toString ());
+                QDir::toNativeSeparators (
+                stg.value (STG_OUTPUT_PATH).toString ()));
 
     ui->tv_expected_content->setEnabled (true);
 }
@@ -48,7 +50,8 @@ void NewPileDlg::on_btn_template_path_clicked()
                     tr("Select the template directory"),
                     ui->le_template_path->text ());
         if (fileName.isEmpty ()) break;
-        ui->le_template_path->setText (fileName);
+        ui->le_template_path->setText (
+                    QDir::toNativeSeparators (fileName));
         break;
     }
 }
@@ -62,7 +65,8 @@ void NewPileDlg::on_btn_output_path_clicked()
                     tr("Select the output directory"),
                     ui->le_output_path->text ());
         if (fileName.isEmpty ()) break;
-        ui->le_output_path->setText (fileName);
+        ui->le_output_path->setText (
+                    QDir::toNativeSeparators (fileName));
         break;
     }
 }

@@ -16,23 +16,31 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
     ui->setupUi(this);
 
 
-    ui->le_cmake_exe->setText (getCMakeExe());
-    ui->le_git_exe->setText (getGitExe());
-    ui->le_hub_exe->setText (getHubExe());
+    ui->le_cmake_exe->setText (
+                QDir::toNativeSeparators (getCMakeExe()));
+    ui->le_git_exe->setText (
+                QDir::toNativeSeparators (getGitExe()));
+    ui->le_hub_exe->setText (
+                QDir::toNativeSeparators (getHubExe()));
 
     QSettings stg;
 
     ui->le_template_path->setText (
-                stg.value (STG_TEMPLATE_PATH).toString ());
+                QDir::toNativeSeparators (
+                stg.value (STG_TEMPLATE_PATH).toString ()));
     ui->le_output_path->setText (
-                stg.value (STG_OUTPUT_PATH).toString ());
+                QDir::toNativeSeparators (
+                stg.value (STG_OUTPUT_PATH).toString ()));
     ui->le_backup_path->setText (
-                stg.value (STG_BACKUP_PATH).toString ());
+                QDir::toNativeSeparators (
+                stg.value (STG_BACKUP_PATH).toString ()));
 
     ui->le_github_un->setText (
-                stg.value (STG_GITHUB_USER).toString ());
+                QDir::toNativeSeparators (
+                stg.value (STG_GITHUB_USER).toString ()));
     ui->le_github_pass->setText (
-                decrypt (stg.value (STG_GITHUB_PASS).toString ()));
+                QDir::toNativeSeparators (
+                decrypt (stg.value (STG_GITHUB_PASS).toString ())));
 
 }
 
@@ -190,7 +198,8 @@ void SettingsDlg::on_btn_cmake_exe_clicked()
                     ui->le_cmake_exe->text (),
                     tr("All Files (*.*)"));
         if (fileName.isEmpty ()) break;
-        ui->le_cmake_exe->setText (fileName);
+        ui->le_cmake_exe->setText (
+                    QDir::toNativeSeparators (fileName));
         break;
     }
 }
@@ -205,7 +214,8 @@ void SettingsDlg::on_btn_git_exe_clicked()
                     ui->le_git_exe->text (),
                     tr("All Files (*.*)"));
         if (fileName.isEmpty ()) break;
-        ui->le_git_exe->setText (fileName);
+        ui->le_git_exe->setText (
+                    QDir::toNativeSeparators (fileName));
         break;
     }
 }
@@ -219,7 +229,8 @@ void SettingsDlg::on_btn_template_path_clicked()
                     tr("Select the template directory"),
                     ui->le_template_path->text ());
         if (fileName.isEmpty ()) break;
-        ui->le_template_path->setText (fileName);
+        ui->le_template_path->setText (
+                    QDir::toNativeSeparators (fileName));
         break;
     }
 }
@@ -233,7 +244,8 @@ void SettingsDlg::on_btn_output_path_clicked()
                     tr("Select the output directory"),
                     ui->le_output_path->text ());
         if (fileName.isEmpty ()) break;
-        ui->le_output_path->setText (fileName);
+        ui->le_output_path->setText (
+                    QDir::toNativeSeparators (fileName));
         break;
     }
 }
@@ -247,7 +259,8 @@ void SettingsDlg::on_btn_backup_path_clicked()
                     tr("Select the output directory"),
                     ui->le_backup_path->text ());
         if (fileName.isEmpty ()) break;
-        ui->le_backup_path->setText (fileName);
+        ui->le_backup_path->setText (
+                    QDir::toNativeSeparators (fileName));
         break;
     }
 }
@@ -262,7 +275,8 @@ void SettingsDlg::on_btn_hub_exe_clicked()
                     ui->le_hub_exe->text (),
                     tr("All Files (*.*)"));
         if (fileName.isEmpty ()) break;
-        ui->le_hub_exe->setText (fileName);
+        ui->le_hub_exe->setText (
+                    QDir::toNativeSeparators (fileName));
         break;
     }
 }

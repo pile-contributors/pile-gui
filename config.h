@@ -15,6 +15,8 @@
 #define DEBUG_THISFILE_ON 1
 #define DEBUG_THISFILE_OFF 0
 
+#define DEBUG_ON 1
+#define DEBUG_OFF 0
 
 // M$ does not care about the rest of the world
 #ifdef _MSC_VER

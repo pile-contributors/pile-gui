@@ -16,6 +16,25 @@
 const QString s_github_org = "pile-contributors";
 const QString s_url_org    = "http://pile-contributors.github.io/";
 
+#if DEBUG_ON
+#    define STGS_DEBUGM printf
+#else
+#    define STGS_DEBUGM black_hole
+#endif
+
+#if DEBUG_ON
+#    define STGS_TRACE_ENTRY printf("GITW ENTRY %s in %s[%d]\n", __func__, __FILE__, __LINE__)
+#else
+#    define STGS_TRACE_ENTRY
+#endif
+
+#if DEBUG_ON
+#    define STGS_TRACE_EXIT printf("GITW EXIT %s in %s[%d]\n", __func__, __FILE__, __LINE__)
+#else
+#    define STGS_TRACE_EXIT
+#endif
+
+
 GitWrapper::GitWrapper() :
     process_exit_code_(-999),
     s_output_(),
@@ -25,33 +44,39 @@ GitWrapper::GitWrapper() :
     s_error_message_(),
     hub_mode_(false)
 {
-    qDebug() << "Creating GitWrapper " << (unsigned long long)this << "\n";
+    STGS_TRACE_ENTRY;
+    STGS_TRACE_EXIT;
 }
 
 GitWrapper::~GitWrapper()
 {
-    qDebug() << "Destroying GitWrapper " << (unsigned long long)this << "\n";
+    STGS_TRACE_ENTRY;
+    STGS_TRACE_EXIT;
 }
 
 QString GitWrapper::getGit()
 {
+    STGS_TRACE_ENTRY;
     QSettings stg;
     QString s_git = stg.value (STG_APPS_GIT).toString ();
     if (s_git.isEmpty ()) {
         PilesGui::showError (
                     QObject::tr("Git executable not set"));
     }
+    STGS_TRACE_EXIT;
     return s_git;
 }
 
 QString GitWrapper::getHub()
 {
+    STGS_TRACE_ENTRY;
     QSettings stg;
     QString s_git = stg.value (STG_APPS_HUB).toString ();
     if (s_git.isEmpty ()) {
         PilesGui::showError (
                     QObject::tr("Hub executable not set"));
     }
+    STGS_TRACE_EXIT;
     return s_git;
 }
 
@@ -74,6 +99,7 @@ QString GitWrapper::getGitBackup()
 bool GitWrapper::addAll(
         const QString & s_path)
 {
+    STGS_TRACE_ENTRY;
     bool b_ret = false;
     for (;;) {
 
@@ -83,12 +109,13 @@ bool GitWrapper::addAll(
 
         QStringList args;
         args << "add"
-                 << "*"
-                 << "--all";
+             << "*"
+             << "--all";
 
         b_ret = wrap_git.doAjob (s_path, args);
         break;
     }
+    STGS_TRACE_EXIT;
     return b_ret;
 }
 
@@ -107,6 +134,7 @@ bool GitWrapper::createGitHubRepo (
         const QString &s_name, const QString &s_org,
         const QString &s_description, const QString &s_info_url)
 {
+    STGS_TRACE_ENTRY;
     bool b_ret = false;
     for (;;) {
 
@@ -136,6 +164,7 @@ bool GitWrapper::createGitHubRepo (
         break;
     }
 
+    STGS_TRACE_EXIT;
     return b_ret;
 }
 
@@ -143,6 +172,7 @@ bool GitWrapper::commit(
         const QString & s_path, const QString &s_message,
         bool b_add_before)
 {
+    STGS_TRACE_ENTRY;
     bool b_ret = false;
     for (;;) {
 
@@ -163,6 +193,7 @@ bool GitWrapper::commit(
         break;
     }
 
+    STGS_TRACE_EXIT;
     return b_ret;
 }
 
@@ -170,6 +201,7 @@ bool GitWrapper::push (
         const QString & s_path, const QString & s_remote,
         const QString & s_branch)
 {
+    STGS_TRACE_ENTRY;
     bool b_ret = false;
     for (;;) {
 
@@ -190,12 +222,14 @@ bool GitWrapper::push (
         break;
     }
 
+    STGS_TRACE_EXIT;
     return b_ret;
 }
 
 bool GitWrapper::init (
         const QString & s_path, bool b_bare)
 {
+    STGS_TRACE_ENTRY;
     bool b_ret = false;
     for (;;) {
 
@@ -214,6 +248,7 @@ bool GitWrapper::init (
         break;
     }
 
+    STGS_TRACE_EXIT;
     return b_ret;
 }
 
@@ -221,6 +256,7 @@ bool GitWrapper::addRemote (
         const QString & s_path, const QString & s_name,
         const QString & s_remote_path)
 {
+    STGS_TRACE_ENTRY;
     bool b_ret = false;
     for (;;) {
         GitWrapper wrap_git;
@@ -237,6 +273,7 @@ bool GitWrapper::addRemote (
         break;
     }
 
+    STGS_TRACE_EXIT;
     return b_ret;
 }
 
@@ -244,6 +281,7 @@ bool GitWrapper::setUpstream (
         const QString & s_path, const QString & s_name,
         const QString & s_ref)
 {
+    STGS_TRACE_ENTRY;
     bool b_ret = false;
     for (;;) {
         GitWrapper wrap_git;
@@ -260,6 +298,7 @@ bool GitWrapper::setUpstream (
         break;
     }
 
+    STGS_TRACE_EXIT;
     return b_ret;
 }
 
@@ -268,6 +307,7 @@ bool GitWrapper::addSubmodule (
         const QString & s_path, const QString & s_subm_path,
         const QString & s_dir_name, const QString & s_message)
 {
+    STGS_TRACE_ENTRY;
     bool b_ret = false;
     for (;;) {
         GitWrapper wrap_git;
@@ -289,6 +329,7 @@ bool GitWrapper::addSubmodule (
         break;
     }
 
+    STGS_TRACE_EXIT;
     return b_ret;
 }
 
@@ -297,6 +338,7 @@ void GitWrapper::afterGeneric (
         const QString & s_error, const QString & s_combined,
         void * kb_data)
 {
+    STGS_TRACE_ENTRY;
     GitWrapper * gw = (GitWrapper *)kb_data;
     gw->process_exit_code_ = process_exit_code;
     gw->s_output_ = s_output;
@@ -311,11 +353,13 @@ void GitWrapper::afterGeneric (
     }
     qDebug () << gw->s_combined_;
     gw->b_ready = true;
+    STGS_TRACE_EXIT;
 }
 
 bool GitWrapper::doAjob (
         const QString & s_path, const QStringList & args)
 {
+    STGS_TRACE_ENTRY;
     bool b_ret = false;
     ProgramRunner * prog_run;
     for (;;) {
@@ -334,6 +378,8 @@ bool GitWrapper::doAjob (
         } else {
             s_git  = getGit ();
         }
+        STGS_DEBUGM("  app: %s\n", TMP_A(s_git));
+        STGS_DEBUGM("  args: %s\n", TMP_A(args.join (" ")));
 
         if (s_git.isEmpty ()) break;
 
@@ -348,9 +394,11 @@ bool GitWrapper::doAjob (
 
         if (!Waiter::waitForBoolean (SEC_TO_MSEC(48),
                                      &b_ready)) {
+            STGS_DEBUGM("  waitForBoolean fails\n");
+
             prog_run->terminate ();
             PilesGui::showError (
-                        QObject::tr ("%1\nGit timed out in command\ngit %2")
+                        QObject::tr ("%1\nProgram timed out in command\n%2")
                         .arg(s_error_message_)
                         .arg (args.join (" ")));
             break;
@@ -362,6 +410,7 @@ bool GitWrapper::doAjob (
     //    if (prog_run != NULL) {
     //        prog_run->terminate ();
     //    }
+    STGS_TRACE_EXIT;
     return b_ret;
 
 }

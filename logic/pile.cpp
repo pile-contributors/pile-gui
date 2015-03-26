@@ -228,7 +228,7 @@ bool Pile::createAllNew(
             permanent_repo_helper =
                     QString("git@github.com:%1/%2-helpers.git")
                     .arg (GitWrapper::gitHubOrg ())
-                    .arg (pile_name_l;
+                    .arg (pile_name_l);
 
             if (!GitWrapper::createGitHubRepo (
                         s_full_path_pile,

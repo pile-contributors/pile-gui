@@ -6,6 +6,24 @@
 #include <QProcessEnvironment>
 #include <QUrl>
 
+#if DEBUG_ON
+#    define PRGR_DEBUGM printf
+#else
+#    define PRGR_DEBUGM black_hole
+#endif
+
+#if DEBUG_ON
+#    define PRGR_TRACE_ENTRY printf("PROGR ENTRY %s in %s[%d]\n", __func__, __FILE__, __LINE__)
+#else
+#    define PRGR_TRACE_ENTRY
+#endif
+
+#if DEBUG_ON
+#    define PRGR_TRACE_EXIT printf("PROGR EXIT %s in %s[%d]\n", __func__, __FILE__, __LINE__)
+#else
+#    define PRGR_TRACE_EXIT
+#endif
+
 ProgramRunner::ProgramRunner(QObject *parent) :
     QObject(parent),
     my_process(),
@@ -15,6 +33,8 @@ ProgramRunner::ProgramRunner(QObject *parent) :
     s_error(),
     s_combined()
 {
+    PRGR_TRACE_ENTRY;
+    PRGR_TRACE_EXIT;
 }
 
 void ProgramRunner::terminate()
@@ -61,7 +81,7 @@ ProgramRunner *ProgramRunner::startProgram(
             penv = QProcessEnvironment::systemEnvironment ();
         }
         foreach(const QString & k, env_vars) {
-            penv->insert (k, env_vars.value (k));
+            penv.insert (k, env_vars.value (k));
         }
         pr->my_process.setProcessEnvironment (penv);
     }

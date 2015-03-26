@@ -2,6 +2,25 @@
 
 #include <QTimerEvent>
 
+#if 0
+#    define STGS_DEBUGM printf
+#else
+#    define STGS_DEBUGM black_hole
+#endif
+
+#if 0
+#    define STGS_TRACE_ENTRY printf("STGS ENTRY %s in %s[%d]\n", __func__, __FILE__, __LINE__)
+#else
+#    define STGS_TRACE_ENTRY
+#endif
+
+#if 0
+#    define STGS_TRACE_EXIT printf("STGS EXIT %s in %s[%d]\n", __func__, __FILE__, __LINE__)
+#else
+#    define STGS_TRACE_EXIT
+#endif
+
+
 Waiter::Waiter (
         kbAfter kb, void * kb_data,
         int timeout_msec, QObject *parent) :

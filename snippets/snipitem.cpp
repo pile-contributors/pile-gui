@@ -1,6 +1,6 @@
 #include "snipitem.h"
 
-#include "SnipItem.h"
+#include "snipitem.h"
 
 #include <QtXml>
 
